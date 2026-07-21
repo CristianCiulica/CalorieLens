@@ -4,6 +4,7 @@ export function setupCounter(element: HTMLButtonElement) {
     counter = count
     element.innerHTML = `Count is ${counter}`
   }
+  //testcom
   element.addEventListener('click', () => setCounter(counter + 1))
   setCounter(0)
 }
