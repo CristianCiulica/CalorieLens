@@ -1,6 +1,6 @@
 import './style.css'
 
-// Add scroll listener for navbar
+
 const navbar = document.querySelector('.navbar');
 
 window.addEventListener('scroll', () => {
