@@ -1,395 +1,424 @@
-:root {
-  --bg-color: #fbfbfd;
-  --text-color: #1d1d1f;
-  --text-muted: #86868b;
-  
-  --primary-color: #0071e3;
-  --primary-hover: #0077ed;
-  
-  --card-bg: #ffffff;
-  --border-color: #d2d2d7;
+@import "tailwindcss";
 
-  --font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  /* ---------- Dark theme, built on the Material dark surface model ----------
+     Material recommends a dark grey ground rather than black: black hides
+     elevation, kills shadows and strains the eye on long scrolls. The ground
+     here is #121110 — Material's #121212 pulled a hair warm, so the whole
+     page sits closer to paper stock than to a terminal.
+
+     Elevation is expressed by compositing white over that ground at the
+     opacities Material specifies per dp — 5% at 01dp up to 16% at 24dp.
+     Higher surface == lighter surface. The steps below are pre-composited. */
+  --color-base: #121110; /* 00dp — the page */
+  --color-surface: #1e1d1c; /* 01dp — full-width bands */
+  --color-elev-2: #232221; /* 02dp */
+  --color-elev-3: #252423; /* 03dp — cards on a band */
+  --color-elev-4: #272626; /* 04dp — panels */
+  --color-elev-6: #2c2b2a; /* 06dp — hover / raised panels */
+  --color-elev-8: #2e2d2d; /* 08dp — the bar */
+  --color-elev-24: #383736; /* 24dp — the closing block */
+
+  /* Text. Material asks body copy to clear 15.8:1 on the ground so it still
+     passes 4.5:1 once a surface is elevated under it. This warm white lands
+     at 16.6:1; the /60 and /38 steps are the medium and disabled emphases. */
+  --color-ink: #f2efea;
+  --color-muted: #9a958d;
+
+  /* Chroma is rationed. Saturated hues vibrate against a dark ground, so
+     every colour here is a light, desaturated tone — and all three are taken
+     from food rather than from a UI palette: leaf, wheat, clay. */
+  --color-accent: #d9b778;
+  --color-protein: #9dbe87;
+  --color-carbs: #d9b778;
+  --color-fat: #c88a66;
+  --color-danger: #e5707a;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+html {
+  scroll-behavior: initial;
+  scroll-padding-top: 6rem;
+  /* Native form controls, scrollbars and the caret follow the theme. */
+  color-scheme: dark;
 }
 
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+html,
 body {
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  font-family: var(--font-main);
-  line-height: 1.47059;
-  font-weight: 400;
-  letter-spacing: -0.022em;
+  background-color: var(--color-base);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overscroll-behavior-y: none;
 }
 
-.container {
-  max-width: 980px;
-  margin: 0 auto;
-  padding: 0 20px;
+::selection {
+  background: var(--color-ink);
+  color: var(--color-base);
 }
 
-.bg-light {
-  background-color: #f5f5f7;
+/* Lenis recommended styles */
+html.lenis,
+html.lenis body {
+  height: auto;
 }
-
-/* Typography */
-h1, h2, h3 {
-  font-weight: 600;
-  letter-spacing: -0.003em;
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
 }
-
-.section-header {
-  text-align: center;
-  margin-bottom: 60px;
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
 }
-
-.section-title {
-  font-size: 48px;
-  line-height: 1.08349;
-  font-weight: 600;
-  letter-spacing: -0.003em;
-  margin-bottom: 12px;
-}
-
-.section-subtitle {
-  font-size: 21px;
-  line-height: 1.381;
-  font-weight: 400;
-  letter-spacing: .011em;
-  color: var(--text-muted);
-}
-
-/* Buttons */
-.btn {
-  display: inline-block;
-  text-decoration: none;
-  font-weight: 400;
-  cursor: pointer;
-  border: none;
-  border-radius: 980px;
-  transition: all 0.2s ease;
-  font-size: 17px;
-  line-height: 1.17648;
-  letter-spacing: -0.022em;
-}
-
-.btn-primary {
-  background-color: var(--primary-color);
-  color: white;
-  padding: 12px 24px;
-}
-
-.btn-primary:hover {
-  background-color: var(--primary-hover);
-}
-
-.btn-text {
-  color: var(--primary-color);
-  background: transparent;
-  padding: 12px 0;
-  font-size: 21px;
-}
-
-.btn-text:hover {
-  text-decoration: underline;
-}
-
-.btn-small {
-  font-size: 12px;
-  padding: 4px 12px;
-  background-color: rgba(0,0,0,0.08);
-  color: var(--text-color);
-}
-
-.btn-small:hover {
-  background-color: rgba(0,0,0,0.12);
-}
-
-/* Navbar */
-.navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 1000;
-  background: rgba(251, 251, 253, 0.8);
-  backdrop-filter: saturate(180%) blur(20px);
-  -webkit-backdrop-filter: saturate(180%) blur(20px);
-  border-bottom: 1px solid transparent;
-  transition: border-color 0.3s ease;
-}
-
-.navbar.scrolled {
-  border-bottom: 1px solid var(--border-color);
-}
-
-.nav-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  height: 48px;
-}
-
-.logo {
-  font-size: 17px;
-  font-weight: 600;
-  color: var(--text-color);
-  text-decoration: none;
-  letter-spacing: -0.01em;
-}
-
-.nav-links {
-  display: flex;
-  gap: 32px;
-}
-
-.nav-links a {
-  color: var(--text-color);
-  text-decoration: none;
-  font-size: 12px;
-  letter-spacing: -.01em;
-  opacity: 0.8;
-  transition: opacity 0.2s;
-}
-
-.nav-links a:hover {
-  opacity: 1;
-}
-
-/* Hero Section */
-.hero {
-  padding-top: 120px;
-  padding-bottom: 80px;
-  text-align: center;
-}
-
-.hero-title {
-  font-size: 80px;
-  line-height: 1.05;
-  font-weight: 600;
-  letter-spacing: -0.015em;
-  margin-bottom: 24px;
-}
-
-.hero-subtitle {
-  font-size: 24px;
-  line-height: 1.33341;
-  font-weight: 400;
-  letter-spacing: .009em;
-  color: var(--text-muted);
-  max-width: 600px;
-  margin: 0 auto 40px;
-}
-
-.hero-actions {
-  display: flex;
-  gap: 24px;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 80px;
-}
-
-.device-mockup {
-  max-width: 320px;
-  margin: 0 auto;
-  border-radius: 40px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+.lenis.lenis-stopped {
   overflow: hidden;
-  border: 8px solid #111;
-  background: #000;
 }
 
-.mockup-img {
-  width: 100%;
-  display: block;
-}
+/* ---------- Typography ---------- */
 
-/* Features */
-.features {
-  padding: 120px 0;
-}
-
-.features-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-}
-
-.feature-card {
-  background: var(--card-bg);
-  border-radius: 18px;
-  padding: 40px;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.04);
-  text-align: left;
-}
-
-.feature-icon {
-  color: var(--primary-color);
-  margin-bottom: 24px;
-}
-
-.feature-card h3 {
-  font-size: 24px;
-  margin-bottom: 12px;
-}
-
-.feature-card p {
-  color: var(--text-muted);
-  font-size: 17px;
-  line-height: 1.47059;
-}
-
-/* How it works */
-.how-it-works {
-  padding: 120px 0;
-}
-
-.steps-container {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.step {
-  background: var(--card-bg);
-  border-radius: 24px;
-  padding: 60px;
-  text-align: center;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.02);
-}
-
-.step-kicker {
-  font-size: 12px;
+/* Display headline — tight, confident, optical sizing at max. */
+.display {
+  font-variation-settings: "opsz" 32;
+  letter-spacing: -0.045em;
+  line-height: 1.02;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--primary-color);
-  margin-bottom: 12px;
-  display: block;
+  text-wrap: balance;
 }
 
-.step h3 {
-  font-size: 32px;
-  margin-bottom: 16px;
+.headline {
+  font-variation-settings: "opsz" 32;
+  letter-spacing: -0.035em;
+  line-height: 1.08;
+  font-weight: 600;
+  text-wrap: balance;
 }
 
-.step p {
-  font-size: 19px;
-  color: var(--text-muted);
-  max-width: 500px;
-  margin: 0 auto;
+/* Section index numeral — quiet, tabular, editorial. */
+.index-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-muted);
 }
 
-/* CTA */
-.cta-section {
-  padding: 120px 0;
+/* ---------- Layout primitives ---------- */
+
+.container-edit {
+  margin-inline: auto;
+  max-width: 78rem;
+  padding-inline: 1.5rem;
+}
+@media (min-width: 640px) {
+  .container-edit {
+    padding-inline: 2.5rem;
+  }
 }
 
-.cta-card {
-  background: #111;
-  color: white;
-  border-radius: 32px;
-  padding: 80px 40px;
-  text-align: center;
+.section {
+  position: relative;
+  padding-block: clamp(6rem, 11vw, 10rem);
 }
 
-.cta-card .section-title {
-  color: white;
+/* Hairline rules structure the page instead of boxes and shadows.
+   12% white is Material's divider opacity for dark surfaces. */
+.rule {
+  border-top: 1px solid rgba(242, 239, 234, 0.12);
 }
 
-.cta-card p {
-  color: #a1a1a6;
-  font-size: 21px;
-  margin-bottom: 40px;
+/* Liquid glass — the bar reads as an 08dp surface, so it is that surface
+   at 72% with the page blurred through it. The inner top highlight is the
+   only thing doing "glass"; on a dark ground a drop shadow would be
+   invisible, so elevation comes from the lighter tone instead. */
+.liquid-glass {
+  background-color: rgba(46, 45, 45, 0.72);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  box-shadow: inset 0 1px 0 rgba(242, 239, 234, 0.08);
 }
 
-.waitlist-form {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-  max-width: 400px;
-  margin: 0 auto;
-}
+/* ---------- Interactive primitives ---------- */
 
-.input-field {
-  flex: 1;
-  padding: 16px 20px;
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.2);
-  background: rgba(255,255,255,0.1);
-  color: white;
-  font-size: 17px;
-  outline: none;
-  font-family: var(--font-main);
-  transition: border-color 0.2s;
-}
-
-.input-field::placeholder {
-  color: #a1a1a6;
-}
-
-.input-field:focus {
-  border-color: white;
-}
-
-/* Footer */
-.footer {
-  border-top: 1px solid var(--border-color);
-  padding: 20px 0;
-  font-size: 12px;
-  color: var(--text-muted);
-}
-
-.footer-content {
-  display: flex;
-  justify-content: space-between;
+/* Primary pill — paper on ground. Label slides on hover (see .btn-label).
+   Sets no display so Tailwind's hidden/inline-flex utilities keep control. */
+.btn-pill {
+  position: relative;
   align-items: center;
-  padding-bottom: 20px;
-  border-bottom: 1px solid var(--border-color);
-  margin-bottom: 20px;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 9999px;
+  background: var(--color-ink);
+  color: var(--color-base);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  transition:
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 0.3s ease;
+  will-change: transform;
+}
+.btn-pill:hover {
+  background: #ffffff;
+}
+.btn-pill:active {
+  transform: scale(0.97);
+}
+.btn-pill:disabled {
+  opacity: 0.4;
+  pointer-events: none;
 }
 
-.footer-logo {
-  font-weight: 600;
-  color: var(--text-color);
+/* Ghost pill — hairline only. */
+.btn-line {
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 9999px;
+  border: 1px solid rgba(242, 239, 234, 0.28);
+  color: var(--color-ink);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  background: transparent;
+  transition:
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.3s ease,
+    background-color 0.3s ease;
+}
+.btn-line:hover {
+  border-color: var(--color-ink);
+  background: rgba(242, 239, 234, 0.07);
+}
+.btn-line:active {
+  transform: scale(0.97);
 }
 
-.footer-links {
+/* Dual-label slide: markup provides two stacked labels. */
+.btn-label {
+  position: relative;
+  display: block;
+  overflow: hidden;
+}
+.btn-label > span {
+  display: block;
+  transition: transform 0.55s cubic-bezier(0.76, 0, 0.24, 1);
+}
+.btn-label > span:last-child {
+  position: absolute;
+  inset: 0;
+  transform: translateY(110%);
+}
+.btn-pill:hover .btn-label > span:first-child,
+.btn-line:hover .btn-label > span:first-child,
+.btn-invert:hover .btn-label > span:first-child {
+  transform: translateY(-110%);
+}
+.btn-pill:hover .btn-label > span:last-child,
+.btn-line:hover .btn-label > span:last-child,
+.btn-invert:hover .btn-label > span:last-child {
+  transform: translateY(0);
+}
+
+/* Text link — underline draws in from the left. */
+.link-draw {
+  position: relative;
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0% 1px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  transition: background-size 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  padding-bottom: 2px;
+}
+.link-draw:hover {
+  background-size: 100% 1px;
+}
+
+/* ---------- Motion helpers ---------- */
+
+/* Mobile menu slide down */
+@keyframes menuSlideDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-menu-slide-down {
+  animation: menuSlideDown 0.25s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: transform, opacity;
+}
+
+/* Line mask reveal targets: wrapper clips, inner translates.
+   Bottom padding keeps descenders (g, p, y) inside the clip;
+   the negative margin cancels it out of the layout. */
+.mask-line {
+  display: block;
+  overflow: hidden;
+  padding-block-end: 0.15em;
+  margin-block-end: -0.15em;
+}
+.mask-line > * {
+  display: block;
+  will-change: transform;
+}
+
+/* Row entrance for injected lists. Deliberately CSS rather than a tween:
+   the resting state is "visible", so if the transition never runs — a
+   throttled tab, reduced motion — the content is still there. */
+.row-enter {
+  opacity: 0;
+  transform: translateY(18px);
+}
+.row-enter-active {
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Word-stagger reveal targets */
+.reveal-word {
+  display: inline-block;
+  will-change: transform, opacity, filter;
+}
+
+/* Scrubbed manifesto words. The resting state is higher than the light
+   theme's 12% — dimmed white falls off a dark ground much faster than
+   dimmed black falls off paper. */
+.scrub-word {
+  display: inline-block;
+  opacity: 0.18;
+  will-change: opacity;
+}
+
+/* Scanning sweep — a single hairline of light, no ornament. */
+.scan-sweep {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(242, 239, 234, 0.95);
+  box-shadow: 0 0 24px 6px rgba(242, 239, 234, 0.45);
+  animation: scanSweep 2.2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+@keyframes scanSweep {
+  0%, 100% { top: 8%; }
+  50% { top: 92%; }
+}
+
+/* Quiet breathing dot for "live" states — pure CSS, no icon. */
+.pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 9999px;
+  background: currentColor;
+  animation: pulseDot 2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(0.8); }
+}
+
+/* Marquee — factual strip, pauses on hover. */
+.marquee {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, black 10%, black 90%, transparent);
+  mask-image: linear-gradient(90deg, transparent, black 10%, black 90%, transparent);
+}
+.marquee-track {
   display: flex;
-  gap: 20px;
+  width: max-content;
+  animation: marquee 42s linear infinite;
+  will-change: transform;
 }
-
-.footer-links a {
-  color: var(--text-color);
-  text-decoration: none;
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
 }
-
-.footer-links a:hover {
-  text-decoration: underline;
-}
-
-.footer-bottom p {
-  margin: 0;
-}
-
-@media (max-width: 834px) {
-  .hero-title {
-    font-size: 56px;
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
   }
-  .features-grid {
-    grid-template-columns: 1fr;
+}
+
+/* Keyboard focus ring for label-wrapped inputs (dropzone). */
+.focus-ring-within:has(:focus-visible) {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+/* Scanner history rail. On wide screens it sits in the flow and collapses
+   to zero width; below lg it becomes an overlay that slides off-canvas, so
+   the workspace keeps the full viewport. */
+.scan-sidebar {
+  width: 19rem;
+  flex-shrink: 0;
+  overflow: hidden;
+  transition:
+    width 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.scan-sidebar.is-closed {
+  width: 0;
+}
+@media (max-width: 1023px) {
+  .scan-sidebar {
+    position: fixed;
+    top: 4rem;
+    bottom: 0;
+    left: 0;
+    z-index: 40;
+    width: 19rem;
+    box-shadow: 0 24px 60px -24px rgba(0, 0, 0, 0.7);
   }
-  .waitlist-form {
-    flex-direction: column;
+  .scan-sidebar.is-closed {
+    width: 19rem;
+    transform: translateX(-100%);
   }
-  .nav-links {
-    display: none;
+}
+
+/* Card-stack travel: each sticky card parks slightly lower than the one
+   before it, so the shrunk stack stays readable underneath. */
+.stack-wrap {
+  top: calc(80px + var(--i) * 16px);
+}
+@media (min-width: 768px) {
+  .stack-wrap {
+    top: calc(100px + var(--i) * 24px);
+  }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-base);
+}
+::-webkit-scrollbar-thumb {
+  background: #3a3938;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #55524f;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .scrub-word {
+    opacity: 1;
   }
 }
