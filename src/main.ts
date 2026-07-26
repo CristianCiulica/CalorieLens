@@ -4,7 +4,8 @@ import { reducedMotion } from './core/motion';
 import { bindAnchors, initScroll, onScroll } from './core/scroll';
 import { splitWords } from './core/split-text';
 import { initMotionAttributes } from './core/motion-attrs';
-import { ACCEPTED_TYPES, SAMPLE_MEAL, analyzeMeal, type MealAnalysis } from './core/analyze';
+import { SAMPLE_MEAL } from './core/analyze';
+import { GOALS, itemRowsHtml, macroRowsHtml } from './core/nutrition';
 
 const $ = <T extends HTMLElement>(sel: string): T | null => document.querySelector<T>(sel);
 
@@ -25,7 +26,7 @@ function initNavbar(): void {
     const glassy = y > 24 || menuOpen;
     header.classList.toggle('liquid-glass', glassy);
     header.style.borderBottom = glassy
-      ? '1px solid rgba(29,29,31,0.08)'
+      ? '1px solid rgba(242,239,234,0.10)'
       : '1px solid transparent';
 
     const hide = !menuOpen && direction === 1 && y > 480;
@@ -290,43 +291,9 @@ function initMarquee(): void {
 // Switching a goal re-counts every number and redraws the bars.
 // ============================================================
 
-interface Goal {
-  label: string;
-  calories: number;
-  protein: number;
-  carbs: number;
-  fat: number;
-  note: string;
-}
-
-const GOALS: Record<string, Goal> = {
-  cut: {
-    label: 'Cut',
-    calories: 1850,
-    protein: 165,
-    carbs: 150,
-    fat: 60,
-    note: 'A moderate deficit with protein kept high, so what you lose is fat and not the work you put in.',
-  },
-  maintain: {
-    label: 'Maintain',
-    calories: 2300,
-    protein: 150,
-    carbs: 240,
-    fat: 75,
-    note: 'Hold your weight steady while training. The split leaves room for carbs around sessions.',
-  },
-  build: {
-    label: 'Build',
-    calories: 2750,
-    protein: 180,
-    carbs: 300,
-    fat: 85,
-    note: 'A controlled surplus. Enough to add tissue, small enough that most of it is muscle.',
-  },
-};
-
 const WEEK_SCALE = 2900;
+/** Dimmed paper — a solid bone block this large would glare on the ground. */
+const BAR_BODY = 'rgba(242, 239, 234, 0.72)';
 
 function initDayTargets(): void {
   const buttons = [...document.querySelectorAll<HTMLButtonElement>('[data-goal]')];
@@ -390,8 +357,15 @@ function initDayTargets(): void {
 
     bars.forEach((bar, i) => {
       bar.style.height = `${(values[i] / WEEK_SCALE) * 100}%`;
-      bar.style.background = values[i] > goal.calories ? 'var(--color-fat)' : 'var(--color-ink)';
-      bar.style.opacity = values[i] > goal.calories ? '0.85' : '0.9';
+
+      // Only the slice standing above the target line carries colour. A fully
+      // tinted bar would put a lot of chroma on a dark ground for no extra
+      // meaning — the overshoot is the information.
+      const overshoot = Math.max(0, values[i] - goal.calories);
+      const share = (overshoot / values[i]) * 100;
+      bar.style.background = overshoot
+        ? `linear-gradient(to bottom, var(--color-fat) 0 ${share}%, ${BAR_BODY} ${share}% 100%)`
+        : BAR_BODY;
       bar.title = `${values[i].toLocaleString('en-US')} kcal`;
     });
 
@@ -446,217 +420,54 @@ function initDayTargets(): void {
 }
 
 // ============================================================
-// Inline analyzer — the product itself, embedded in the page.
-// Idle dropzone → drag-over → scanning → breakdown, every state designed.
+// Showcase — the landing shows the shape of an answer, it doesn't take
+// uploads. Scanning happens in the app at /scan.html.
 // ============================================================
 
-const MACROS = [
-  { key: 'total_protein', label: 'Protein', kcalPerGram: 4, color: 'var(--color-protein)' },
-  { key: 'total_carbs', label: 'Carbs', kcalPerGram: 4, color: 'var(--color-carbs)' },
-  { key: 'total_fat', label: 'Fat', kcalPerGram: 9, color: 'var(--color-fat)' },
-] as const;
+function initShowcase(): void {
+  const photo = $<HTMLImageElement>('#showcase-photo');
+  const meal = $('#showcase-meal');
+  const macros = $('#showcase-macros');
+  const items = $('#showcase-items');
+  const counter = $('[data-showcase-count]');
+  const bar = $('[data-showcase-bar]');
+  if (!photo || !meal || !macros || !items || !counter || !bar) return;
 
-function initAnalyzer(): void {
-  const dropzone = $<HTMLLabelElement>('#dropzone');
-  const frame = $('#dropzone-frame');
-  const title = $('#dropzone-title');
-  const input = $<HTMLInputElement>('#dropzone-input');
-  const errorLine = $('#dropzone-error');
-  const aside = $('#dropzone-aside');
-  const sampleBtn = $('#sample-scan');
+  photo.src = SAMPLE_MEAL.image_url;
+  meal.textContent = SAMPLE_MEAL.meal_name;
+  macros.innerHTML = macroRowsHtml(SAMPLE_MEAL);
+  items.innerHTML = itemRowsHtml(SAMPLE_MEAL);
 
-  const panel = $('#analyzer-panel');
-  const preview = $<HTMLImageElement>('#analyzer-preview');
-  const scrim = $('#analyzer-scrim');
-  const sweep = $('#analyzer-sweep');
-  const resetBtn = $('#analyzer-reset');
+  if (reducedMotion()) {
+    counter.textContent = SAMPLE_MEAL.total_calories.toLocaleString('en-US');
+    return;
+  }
 
-  const loadingBox = $('#analyzer-loading');
-  const errorBox = $('#analyzer-error');
-  const errorMessage = $('#analyzer-error-message');
-  const retryBtn = $('#analyzer-retry');
-  const resultBox = $('#analyzer-result');
-  const resultMeal = $('#result-meal');
-  const resultMacros = $('#result-macros');
-  const resultItems = $('#result-items');
-  const resultFooter = $('#result-footer');
-
-  if (!dropzone || !frame || !title || !input || !errorLine || !panel || !preview) return;
-  if (!scrim || !sweep || !resetBtn || !loadingBox || !errorBox || !errorMessage) return;
-  if (!retryBtn || !resultBox || !resultMeal || !resultMacros || !resultItems || !resultFooter) return;
-
-  let objectUrl: string | null = null;
-  let currentFile: File | null = null;
-
-  const setDragOver = (over: boolean): void => {
-    dropzone.classList.toggle('scale-[0.985]', over);
-    dropzone.classList.toggle('bg-white', over);
-    frame.classList.toggle('inset-3', over);
-    frame.classList.toggle('border-ink', over);
-    frame.classList.toggle('inset-6', !over);
-    frame.classList.toggle('group-hover:inset-4', !over);
-    frame.classList.toggle('group-hover:border-ink/30', !over);
-    title.textContent = over ? 'Release the photo' : 'Drag your photo here';
-  };
-
-  const showIdle = (message?: string): void => {
-    dropzone.hidden = false;
-    panel.hidden = true;
-    if (aside) aside.hidden = false;
-    errorLine.hidden = !message;
-    if (message) errorLine.textContent = message;
-  };
-
-  const showPanel = (state: 'loading' | 'error' | 'result'): void => {
-    dropzone.hidden = true;
-    errorLine.hidden = true;
-    if (aside) aside.hidden = true;
-    panel.hidden = false;
-    scrim.hidden = state !== 'loading';
-    sweep.hidden = state !== 'loading';
-    preview.classList.toggle('scale-105', state === 'loading');
-    loadingBox.hidden = state !== 'loading';
-    errorBox.hidden = state !== 'error';
-    resultBox.hidden = state !== 'result';
-    resultFooter.hidden = state !== 'result';
-    if (state !== 'result') resultItems.innerHTML = '';
-  };
-
-  const renderResult = (analysis: MealAnalysis): void => {
-    resultMeal.textContent = analysis.meal_name;
-
-    const macroKcal = MACROS.map((m) => (analysis[m.key] ?? 0) * m.kcalPerGram);
-    const macroTotal = macroKcal.reduce((a, b) => a + b, 0) || 1;
-
-    resultMacros.innerHTML = MACROS.map((macro, i) => {
-      const grams = analysis[macro.key] ?? 0;
-      const share = (macroKcal[i] / macroTotal) * 100;
-      return `
-        <div>
-          <div class="flex items-baseline justify-between">
-            <dt class="text-sm text-ink/50">${macro.label}</dt>
-            <dd class="text-base font-medium tabular-nums text-ink">${grams}<span class="text-ink/40">g</span></dd>
-          </div>
-          <div class="mt-2 h-px w-full bg-ink/10">
-            <div data-macro-bar class="h-[2px] -translate-y-[0.5px] origin-left" style="width: ${share}%; background: ${macro.color}"></div>
-          </div>
-        </div>`;
-    }).join('');
-
-    resultItems.innerHTML = analysis.items
-      .map(
-        (item, i) => `
-        <li class="rule last:border-b last:border-b-ink/12">
-          <div class="grid gap-2 py-6 sm:grid-cols-[4rem_1fr_auto] sm:items-baseline sm:gap-8">
-            <span class="index-label" aria-hidden="true">${String(i + 1).padStart(2, '0')}</span>
-            <div>
-              <p class="text-lg font-medium tracking-tight text-ink">${item.name}</p>
-              <p class="mt-1 text-sm text-ink/45">${item.portion} · ${item.protein}g protein · ${item.carbs}g carbs · ${item.fat}g fat</p>
-            </div>
-            <p class="text-lg font-medium tabular-nums tracking-tight text-ink">${item.calories}<span class="text-ink/40"> kcal</span></p>
-          </div>
-        </li>`,
-      )
-      .join('');
-
-    showPanel('result');
-
-    if (reducedMotion()) {
-      const counter = document.querySelector<HTMLElement>('[data-verdict-count]');
-      if (counter) counter.textContent = String(analysis.total_calories);
-      return;
-    }
-
-    // The total counts up and every bar draws in from the left.
-    requestAnimationFrame(() => {
-      const counter = document.querySelector<HTMLElement>('[data-verdict-count]');
-      const bar = document.querySelector<HTMLElement>('[data-verdict-bar]');
-
-      if (counter) {
-        const state = { value: 0 };
-        gsap.to(state, {
-          value: analysis.total_calories,
-          duration: 1.6,
-          ease: 'power3.out',
-          onUpdate: () => (counter.textContent = Math.round(state.value).toLocaleString('en-US')),
-        });
-      }
-      if (bar) gsap.from(bar, { scaleX: 0, duration: 1.6, ease: 'power3.out' });
-      gsap.from('[data-macro-bar]', { scaleX: 0, duration: 1.4, ease: 'power3.out', stagger: 0.08 });
-      gsap.from(resultItems.children, {
-        y: 18,
-        autoAlpha: 0,
-        duration: 0.9,
-        ease: 'power3.out',
-        stagger: 0.05,
-        delay: 0.2,
-      });
-      ScrollTrigger.refresh();
-    });
-  };
-
-  const run = async (file: File): Promise<void> => {
-    currentFile = file;
-    if (objectUrl) URL.revokeObjectURL(objectUrl);
-    objectUrl = URL.createObjectURL(file);
-    preview.src = objectUrl;
-
-    showPanel('loading');
-
-    try {
-      const analysis = await analyzeMeal(file);
-      analysis.image_url = objectUrl ?? '';
-      renderResult(analysis);
-    } catch (e) {
-      errorMessage.textContent = e instanceof Error ? e.message : 'Unknown error';
-      showPanel('error');
-    }
-  };
-
-  const handleFile = (file: File | undefined | null): void => {
-    if (!file) return;
-    if (!ACCEPTED_TYPES.includes(file.type)) {
-      showIdle('Unsupported format. Use a JPEG, PNG or WebP image.');
-      return;
-    }
-    void run(file);
-  };
-
-  input.addEventListener('change', () => handleFile(input.files?.[0]));
-
-  dropzone.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    setDragOver(true);
+  // The total counts up and the bars draw once the panel is on screen.
+  const state = { value: 0 };
+  const count = gsap.to(state, {
+    value: SAMPLE_MEAL.total_calories,
+    duration: 1.6,
+    ease: 'power3.out',
+    paused: true,
+    onUpdate: () => (counter.textContent = Math.round(state.value).toLocaleString('en-US')),
   });
-  dropzone.addEventListener('dragleave', (e) => {
-    e.preventDefault();
-    setDragOver(false);
-  });
-  dropzone.addEventListener('drop', (e) => {
-    e.preventDefault();
-    setDragOver(false);
-    handleFile(e.dataTransfer?.files?.[0]);
+  const draw = gsap.from([bar, ...macros.querySelectorAll('[data-macro-bar]')], {
+    scaleX: 0,
+    duration: 1.5,
+    ease: 'power3.out',
+    stagger: 0.08,
+    paused: true,
   });
 
-  resetBtn.addEventListener('click', () => {
-    if (objectUrl) URL.revokeObjectURL(objectUrl);
-    objectUrl = null;
-    currentFile = null;
-    input.value = '';
-    showIdle();
-    ScrollTrigger.refresh();
-  });
-
-  retryBtn.addEventListener('click', () => {
-    if (currentFile) void run(currentFile);
-    else showIdle();
-  });
-
-  // A pre-computed breakdown, for readers who don't have a plate on hand.
-  sampleBtn?.addEventListener('click', () => {
-    currentFile = null;
-    preview.src = SAMPLE_MEAL.image_url;
-    renderResult(SAMPLE_MEAL);
+  ScrollTrigger.create({
+    trigger: counter,
+    start: 'top 85%',
+    once: true,
+    onEnter: () => {
+      count.play();
+      draw.play();
+    },
   });
 }
 
@@ -694,7 +505,7 @@ initDayTargets();
 initCounters();
 initFaq();
 initFooter();
-initAnalyzer();
+initShowcase();
 initWaitlist();
 initMotionAttributes();
 

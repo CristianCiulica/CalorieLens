@@ -8,7 +8,7 @@
       name="description"
       content="CalorieLens reads your plate with a vision model trained on food and returns calories and macros in seconds. No account, no manual logging."
     />
-    <meta name="theme-color" content="#fbfbfd" />
+    <meta name="theme-color" content="#121110" />
     <meta property="og:title" content="CalorieLens — One photo. Every macro." />
     <meta
       property="og:description"
@@ -56,7 +56,7 @@
         </ul>
 
         <div class="flex items-center gap-3">
-          <a href="#upload" class="btn-pill hidden items-center justify-center px-5 py-2 text-sm lg:inline-flex">
+          <a href="/scan.html" class="btn-pill hidden items-center justify-center px-5 py-2 text-sm lg:inline-flex">
             <span class="btn-label">
               <span>Scan a meal</span>
               <span aria-hidden="true">Scan a meal</span>
@@ -112,9 +112,9 @@
             </p>
 
             <a
-              href="#upload"
+              href="/scan.html"
               data-magnetic="0.2"
-              class="btn-pill mt-12 inline-flex px-8 py-4 text-base shadow-[0_16px_40px_-16px_rgba(29,29,31,0.55)]"
+              class="btn-pill mt-12 inline-flex px-8 py-4 text-base"
             >
               <span class="btn-label">
                 <span>Scan a photo</span>
@@ -127,7 +127,7 @@
             </a>
           </div>
 
-          <p data-hero-reassure class="mt-16 text-[0.8125rem] leading-relaxed text-ink/35">
+          <p data-hero-reassure class="mt-16 text-[0.8125rem] leading-relaxed text-ink/50">
             No account&ensp;·&ensp;Free&ensp;·&ensp;Photo isn't stored
           </p>
         </div>
@@ -167,149 +167,60 @@
             data-reveal-stagger="0.04"
             class="headline mt-16 max-w-3xl text-[clamp(2.5rem,6vw,4.5rem)] text-ink"
           >
-            Try it now.
+            See what comes back.
           </h2>
           <p data-reveal="fade" data-reveal-delay="0.15" class="mt-6 max-w-lg text-lg text-ink/60">
-            Drop in a clear photo of your plate. No account, no waiting.
+            One photo in, this out: the total, the split, and every item it found — with the
+            portion each number assumes.
           </p>
 
-          <div id="upload" data-reveal="scale" data-reveal-delay="0.2" class="mx-auto mt-16 max-w-4xl">
-            <!-- Idle / drag-over -->
-            <label
-              id="dropzone"
-              class="focus-ring-within group relative flex cursor-pointer flex-col items-center justify-center gap-8 rounded-[2rem] bg-base px-8 py-28 text-center transition-[transform,background-color] duration-500 hover:bg-white sm:py-36"
-            >
-              <!-- Hairline frame that tightens on hover — the only ornament. -->
-              <span
-                id="dropzone-frame"
-                aria-hidden="true"
-                class="pointer-events-none absolute inset-6 rounded-[1.6rem] border border-ink/12 transition-all duration-500 group-hover:inset-4 group-hover:border-ink/30"
-              ></span>
+          <div data-reveal="scale" data-reveal-delay="0.2" class="mx-auto mt-16 max-w-4xl">
+            <div class="grid gap-2 overflow-hidden rounded-[2rem] bg-elev-4 p-2 sm:grid-cols-2 sm:bg-surface">
+              <div class="relative aspect-[4/5] overflow-hidden rounded-[1.6rem] sm:aspect-auto sm:min-h-[460px]">
+                <img
+                  id="showcase-photo"
+                  alt="A grilled chicken and greens bowl, analyzed"
+                  loading="lazy"
+                  class="absolute inset-0 h-full w-full object-cover"
+                />
+              </div>
 
-              <span class="text-[3.5rem] font-light leading-none text-ink/30 transition-colors duration-500 group-hover:text-ink" aria-hidden="true">+</span>
-              <span class="space-y-3">
-                <span id="dropzone-title" class="headline block text-2xl text-ink sm:text-3xl">
-                  Drag your photo here
-                </span>
-                <span class="block text-base text-ink/45">
-                  or tap to choose · JPEG, PNG, WebP
-                </span>
-              </span>
-              <input
-                id="dropzone-input"
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                class="sr-only"
-                aria-label="Upload a photo of your meal"
-              />
-            </label>
+              <div class="flex flex-col justify-center rounded-[1.6rem] p-6 sm:bg-elev-4 sm:p-12">
+                <p class="index-label">Result</p>
+                <p id="showcase-meal" class="headline mt-6 hyphens-auto break-words text-2xl text-ink sm:text-3xl lg:text-4xl xl:text-5xl"></p>
 
-            <p id="dropzone-error" hidden class="mt-6 text-center text-base font-medium text-danger" role="alert"></p>
+                <div class="mt-10">
+                  <div class="flex items-baseline justify-between">
+                    <p class="text-sm text-ink/50">Total calories</p>
+                    <p class="text-3xl font-medium tabular-nums tracking-tight text-ink">
+                      <span data-showcase-count>0</span><span class="text-ink/40"> kcal</span>
+                    </p>
+                  </div>
+                  <div class="mt-4 h-px w-full bg-ink/10">
+                    <div data-showcase-bar class="h-[3px] w-full -translate-y-[1px] origin-left bg-ink"></div>
+                  </div>
+                </div>
 
-            <div id="dropzone-aside" class="mt-8 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-sm text-ink/40">
-              <span>Nothing to hand?</span>
-              <button id="sample-scan" type="button" class="link-draw font-medium text-ink/70 hover:text-ink">
-                See a sample breakdown
-              </button>
+                <dl id="showcase-macros" class="mt-10 space-y-6"></dl>
+
+                <p class="mt-8 text-sm text-ink/40">
+                  An estimate, not a scale reading. Every item below can be checked.
+                </p>
+              </div>
             </div>
 
-            <!-- Preview + breakdown -->
-            <div id="analyzer-panel" hidden>
-              <div class="grid gap-2 overflow-hidden rounded-[2rem] bg-white p-2 sm:grid-cols-2 sm:bg-base">
-                <div class="relative aspect-[4/5] overflow-hidden rounded-[1.6rem] sm:aspect-auto sm:min-h-[460px]">
-                  <img
-                    id="analyzer-preview"
-                    alt="Uploaded meal photo"
-                    class="absolute inset-0 h-full w-full object-cover"
-                    style="transition: transform 2.4s cubic-bezier(0.22, 1, 0.36, 1)"
-                  />
-                  <div id="analyzer-scrim" hidden class="absolute inset-0 bg-ink/20"></div>
-                  <div id="analyzer-sweep" hidden class="scan-sweep" aria-hidden="true"></div>
+            <ul id="showcase-items" class="mt-10"></ul>
 
-                  <!-- Wrapper owns the absolute placement; .btn-pill keeps its own
-                       position:relative for the label-slide animation. -->
-                  <div class="pointer-events-none absolute inset-x-0 bottom-5 flex justify-center">
-                    <button
-                      id="analyzer-reset"
-                      type="button"
-                      class="btn-pill pointer-events-auto inline-flex whitespace-nowrap px-6 py-3 text-sm"
-                      style="box-shadow: 0 0 0 1px rgba(255,255,255,0.18), 0 10px 28px -8px rgba(0,0,0,0.55)"
-                    >
-                      <span class="btn-label">
-                        <span>Another photo</span>
-                        <span aria-hidden="true">Another photo</span>
-                      </span>
-                    </button>
-                  </div>
-                </div>
-
-                <div
-                  class="flex flex-col justify-center rounded-[1.6rem] p-6 sm:bg-white sm:p-12"
-                  aria-live="polite"
-                >
-                  <!-- Loading -->
-                  <div id="analyzer-loading" hidden>
-                    <div class="flex items-center gap-3 text-ink">
-                      <span class="pulse-dot" aria-hidden="true"></span>
-                      <span class="text-sm font-medium uppercase tracking-[0.14em]">Analyzing</span>
-                    </div>
-                    <p class="headline mt-6 text-3xl text-ink">Reading every item on the plate.</p>
-                    <p class="mt-4 text-base text-ink/50">
-                      Portions are estimated from the frame — plate size, depth, shadow.
-                    </p>
-                  </div>
-
-                  <!-- Error -->
-                  <div id="analyzer-error" hidden>
-                    <p class="index-label text-danger" role="alert">Error</p>
-                    <p class="headline mt-6 text-3xl text-ink">Couldn't analyze that photo.</p>
-                    <p id="analyzer-error-message" class="mt-4 text-base text-ink/60"></p>
-                    <button id="analyzer-retry" type="button" class="btn-line mt-10 inline-flex self-start px-7 py-3.5 text-sm">
-                      <span class="btn-label">
-                        <span>Try again</span>
-                        <span aria-hidden="true">Try again</span>
-                      </span>
-                    </button>
-                  </div>
-
-                  <!-- Result -->
-                  <div id="analyzer-result" hidden>
-                    <p class="index-label">Result</p>
-                    <p id="result-meal" class="headline mt-6 text-4xl text-ink sm:text-5xl"></p>
-
-                    <div class="mt-10">
-                      <div class="flex items-baseline justify-between">
-                        <p class="text-sm text-ink/50">Total calories</p>
-                        <p class="text-3xl font-medium tabular-nums tracking-tight text-ink">
-                          <span data-verdict-count>0</span><span class="text-ink/40"> kcal</span>
-                        </p>
-                      </div>
-                      <div class="mt-4 h-px w-full bg-ink/10">
-                        <div data-verdict-bar class="h-[3px] w-full -translate-y-[1px] origin-left bg-ink"></div>
-                      </div>
-                    </div>
-
-                    <dl id="result-macros" class="mt-10 space-y-6"></dl>
-
-                    <p class="mt-8 text-sm text-ink/40">
-                      An estimate, not a scale reading. Every item below can be checked.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Item breakdown — hairline rows, full width under the panel. -->
-              <ul id="result-items" class="mt-10"></ul>
-
-              <div id="result-footer" hidden class="mt-10 flex flex-wrap items-center gap-4">
-                <a href="/scan.html" class="btn-line inline-flex px-7 py-3.5 text-sm">
-                  <span class="btn-label">
-                    <span>Open the full scanner</span>
-                    <span aria-hidden="true">Open the full scanner</span>
-                  </span>
-                </a>
-                <p class="text-sm text-ink/40">History, camera capture and per-item detail live there.</p>
-              </div>
+            <div class="mt-14 flex flex-wrap items-center gap-5">
+              <a href="/scan.html" data-magnetic="0.2" class="btn-pill inline-flex px-8 py-4 text-base">
+                <span class="btn-label">
+                  <span>Open the scanner</span>
+                  <span aria-hidden="true">Open the scanner</span>
+                </span>
+              </a>
+              <p class="max-w-xs text-sm leading-relaxed text-ink/45">
+                Camera capture, scan history and your daily targets all live there.
+              </p>
             </div>
           </div>
         </div>
@@ -326,12 +237,12 @@
 
         <div class="mt-16 grid grid-cols-2 gap-4 px-4 sm:gap-6 sm:px-6 lg:grid-cols-4 lg:px-10">
           <figure data-parallax="0.16">
-            <div class="overflow-hidden rounded-[1.6rem] bg-base">
+            <div class="overflow-hidden rounded-[1.6rem] bg-elev-2">
               <img
                 src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80"
                 alt="A bowl of grilled chicken, greens and grains"
                 loading="lazy"
-                class="aspect-[4/5] w-full object-cover transition-transform duration-[1.2s] ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.04]"
+                class="aspect-[4/5] w-full object-cover brightness-90 transition-[transform,filter] duration-[1.2s] ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.04] hover:brightness-105"
               />
             </div>
             <figcaption class="rule mt-5 pt-4">
@@ -341,12 +252,12 @@
           </figure>
 
           <figure data-parallax="-0.12">
-            <div class="overflow-hidden rounded-[1.6rem] bg-base">
+            <div class="overflow-hidden rounded-[1.6rem] bg-elev-2">
               <img
                 src="https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=800&q=80"
                 alt="Seared salmon fillet with vegetables"
                 loading="lazy"
-                class="aspect-[4/5] w-full object-cover transition-transform duration-[1.2s] ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.04]"
+                class="aspect-[4/5] w-full object-cover brightness-90 transition-[transform,filter] duration-[1.2s] ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.04] hover:brightness-105"
               />
             </div>
             <figcaption class="rule mt-5 pt-4">
@@ -356,12 +267,12 @@
           </figure>
 
           <figure data-parallax="0.22">
-            <div class="overflow-hidden rounded-[1.6rem] bg-base">
+            <div class="overflow-hidden rounded-[1.6rem] bg-elev-2">
               <img
                 src="https://images.unsplash.com/photo-1525351484163-7529414344d8?w=800&q=80"
                 alt="Avocado toast with poached eggs"
                 loading="lazy"
-                class="aspect-[4/5] w-full object-cover transition-transform duration-[1.2s] ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.04]"
+                class="aspect-[4/5] w-full object-cover brightness-90 transition-[transform,filter] duration-[1.2s] ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.04] hover:brightness-105"
               />
             </div>
             <figcaption class="rule mt-5 pt-4">
@@ -371,12 +282,12 @@
           </figure>
 
           <figure data-parallax="-0.18">
-            <div class="overflow-hidden rounded-[1.6rem] bg-base">
+            <div class="overflow-hidden rounded-[1.6rem] bg-elev-2">
               <img
                 src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&q=80"
                 alt="Berry and seed breakfast bowl"
                 loading="lazy"
-                class="aspect-[4/5] w-full object-cover transition-transform duration-[1.2s] ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.04]"
+                class="aspect-[4/5] w-full object-cover brightness-90 transition-[transform,filter] duration-[1.2s] ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.04] hover:brightness-105"
               />
             </div>
             <figcaption class="rule mt-5 pt-4">
@@ -416,7 +327,7 @@
             <li class="stack-wrap sticky flex h-[70vh] items-start" style="--i: 0">
               <div
                 data-stack-card
-                class="flex min-h-[320px] w-full flex-col justify-between rounded-[2.5rem] border border-ink/8 bg-surface p-8 sm:p-12 md:min-h-[420px] md:p-16"
+                class="flex min-h-[320px] w-full flex-col justify-between rounded-[2.5rem] border border-ink/10 bg-elev-3 p-8 sm:p-12 md:min-h-[420px] md:p-16"
                 style="transform-origin: top center"
               >
                 <span class="index-label" aria-hidden="true">01</span>
@@ -433,7 +344,7 @@
             <li class="stack-wrap sticky flex h-[70vh] items-start" style="--i: 1">
               <div
                 data-stack-card
-                class="flex min-h-[320px] w-full flex-col justify-between rounded-[2.5rem] border border-ink/8 bg-surface p-8 sm:p-12 md:min-h-[420px] md:p-16"
+                class="flex min-h-[320px] w-full flex-col justify-between rounded-[2.5rem] border border-ink/10 bg-elev-3 p-8 sm:p-12 md:min-h-[420px] md:p-16"
                 style="transform-origin: top center"
               >
                 <span class="index-label" aria-hidden="true">02</span>
@@ -450,7 +361,7 @@
             <li class="stack-wrap sticky flex h-[70vh] items-start" style="--i: 2">
               <div
                 data-stack-card
-                class="flex min-h-[320px] w-full flex-col justify-between rounded-[2.5rem] border border-ink/8 bg-surface p-8 sm:p-12 md:min-h-[420px] md:p-16"
+                class="flex min-h-[320px] w-full flex-col justify-between rounded-[2.5rem] border border-ink/10 bg-elev-3 p-8 sm:p-12 md:min-h-[420px] md:p-16"
                 style="transform-origin: top center"
               >
                 <span class="index-label" aria-hidden="true">03</span>
@@ -467,7 +378,7 @@
             <li class="stack-wrap sticky flex h-[calc(320px+24vh)] items-start md:h-[calc(420px+24vh)]" style="--i: 3">
               <div
                 data-stack-card
-                class="flex min-h-[320px] w-full flex-col justify-between rounded-[2.5rem] border border-ink/8 bg-surface p-8 sm:p-12 md:min-h-[420px] md:p-16"
+                class="flex min-h-[320px] w-full flex-col justify-between rounded-[2.5rem] border border-ink/10 bg-elev-3 p-8 sm:p-12 md:min-h-[420px] md:p-16"
                 style="transform-origin: top center"
               >
                 <span class="index-label" aria-hidden="true">04</span>
@@ -515,7 +426,7 @@
             <div data-reveal="fade">
               <p class="index-label">Daily target</p>
               <p class="mt-6 text-[clamp(3.5rem,9vw,5.5rem)] font-semibold leading-none tracking-tighter tabular-nums text-ink">
-                <span id="goal-calories">2,300</span><span class="text-ink/30 text-[0.4em] font-medium tracking-tight"> kcal</span>
+                <span id="goal-calories">2,300</span><span class="text-ink/40 text-[0.4em] font-medium tracking-tight"> kcal</span>
               </p>
               <p id="goal-note" class="mt-5 max-w-xs text-sm leading-relaxed text-ink/50"></p>
 
@@ -613,7 +524,7 @@
 
             <div data-reveal="fade" data-reveal-delay="0.24" class="rule pt-6">
               <p class="text-5xl font-semibold tracking-tighter tabular-nums text-ink sm:text-6xl">
-                <span class="text-ink/30">&lt;</span><span class="counter" data-target="2" data-decimals="0">0</span>s
+                <span class="text-ink/40">&lt;</span><span class="counter" data-target="2" data-decimals="0">0</span>s
               </p>
               <p class="mt-5 text-base font-semibold text-ink">Response time</p>
               <p class="mt-2 text-sm leading-relaxed text-ink/50">
@@ -846,27 +757,27 @@
       </section>
 
       <!-- ==================== CTA ==================== -->
-      <section class="bg-ink py-[clamp(7rem,14vw,12rem)] text-base" aria-labelledby="cta-heading">
+      <section class="bg-elev-24 py-[clamp(7rem,14vw,12rem)] text-ink" aria-labelledby="cta-heading">
         <div class="container-edit flex flex-col items-center text-center">
           <h2
             id="cta-heading"
             data-reveal="words"
             data-reveal-stagger="0.05"
-            class="display max-w-4xl text-[clamp(2.75rem,7vw,6rem)] text-base"
+            class="display max-w-4xl text-[clamp(2.75rem,7vw,6rem)] text-ink"
           >
             Ready to stop guessing?
           </h2>
 
-          <p data-reveal="fade" data-reveal-delay="0.25" class="mt-8 max-w-md text-lg text-base/60">
+          <p data-reveal="fade" data-reveal-delay="0.25" class="mt-8 max-w-md text-lg text-ink/60">
             Scan a meal in seconds. From here on, the log fills itself.
           </p>
 
           <a
             data-reveal="scale"
             data-reveal-delay="0.4"
-            href="#upload"
+            href="/scan.html"
             data-magnetic="0.3"
-            class="btn-invert mt-12 inline-flex items-center justify-center overflow-hidden rounded-full bg-base px-10 py-5 text-lg font-medium tracking-tight text-ink transition-transform duration-500 hover:scale-[1.03] active:scale-[0.97]"
+            class="btn-invert mt-12 inline-flex items-center justify-center overflow-hidden rounded-full bg-ink px-10 py-5 text-lg font-medium tracking-tight text-base transition-transform duration-500 hover:scale-[1.03] active:scale-[0.97]"
           >
             <span class="btn-label">
               <span>Scan a meal</span>
@@ -881,12 +792,12 @@
               required
               placeholder="you@email.com"
               aria-label="Email address"
-              class="w-full rounded-full border border-base/25 bg-transparent px-6 py-3.5 text-base text-base placeholder:text-base/35 transition-colors focus:border-base/60 focus:outline-none"
+              class="w-full rounded-full border border-ink/25 bg-transparent px-6 py-3.5 text-base text-ink placeholder:text-ink/40 transition-colors focus:border-ink/60 focus:outline-none"
             />
             <button
               id="waitlist-submit"
               type="submit"
-              class="btn-invert inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-base px-7 py-3.5 text-base font-medium tracking-tight text-ink transition-transform duration-500 hover:scale-[1.03] active:scale-[0.97]"
+              class="btn-invert inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-ink px-7 py-3.5 text-base font-medium tracking-tight text-base transition-transform duration-500 hover:scale-[1.03] active:scale-[0.97]"
             >
               <span class="btn-label">
                 <span>Join the waitlist</span>
@@ -895,7 +806,7 @@
             </button>
           </form>
 
-          <p data-reveal="fade" data-reveal-delay="0.55" class="mt-10 max-w-lg text-sm leading-relaxed text-base/40">
+          <p data-reveal="fade" data-reveal-delay="0.55" class="mt-10 max-w-lg text-sm leading-relaxed text-ink/45">
             Free during the beta, no card required. CalorieLens estimates — it isn't a medical or
             dietetic service, and anything you're basing a health decision on deserves a
             professional's eyes.
@@ -905,45 +816,45 @@
     </main>
 
     <!-- ==================== FOOTER ==================== -->
-    <footer class="overflow-hidden bg-ink pb-8 text-base">
+    <footer class="overflow-hidden bg-elev-24 pb-8 text-ink">
       <div class="container-edit">
-        <div class="grid gap-10 border-t border-base/15 pt-14 sm:grid-cols-3">
+        <div class="grid gap-10 border-t border-ink/12 pt-14 sm:grid-cols-3">
           <nav aria-label="Page">
-            <h3 class="text-xs font-medium uppercase tracking-[0.14em] text-base/35">Page</h3>
+            <h3 class="text-xs font-medium uppercase tracking-[0.14em] text-ink/45">Page</h3>
             <ul class="mt-5 space-y-3">
-              <li><a href="#scanner" class="link-draw text-sm text-base/60 hover:text-base">Scan</a></li>
-              <li><a href="#how-it-works" class="link-draw text-sm text-base/60 hover:text-base">How it works</a></li>
-              <li><a href="#accuracy" class="link-draw text-sm text-base/60 hover:text-base">Accuracy</a></li>
-              <li><a href="#technology" class="link-draw text-sm text-base/60 hover:text-base">Technology</a></li>
-              <li><a href="#faq" class="link-draw text-sm text-base/60 hover:text-base">Questions</a></li>
+              <li><a href="#scanner" class="link-draw text-sm text-ink/60 hover:text-ink">Scan</a></li>
+              <li><a href="#how-it-works" class="link-draw text-sm text-ink/60 hover:text-ink">How it works</a></li>
+              <li><a href="#accuracy" class="link-draw text-sm text-ink/60 hover:text-ink">Accuracy</a></li>
+              <li><a href="#technology" class="link-draw text-sm text-ink/60 hover:text-ink">Technology</a></li>
+              <li><a href="#faq" class="link-draw text-sm text-ink/60 hover:text-ink">Questions</a></li>
             </ul>
           </nav>
 
           <nav aria-label="Product">
-            <h3 class="text-xs font-medium uppercase tracking-[0.14em] text-base/35">Product</h3>
+            <h3 class="text-xs font-medium uppercase tracking-[0.14em] text-ink/45">Product</h3>
             <ul class="mt-5 space-y-3">
-              <li><a href="/scan.html" class="link-draw text-sm text-base/60 hover:text-base">Full scanner</a></li>
-              <li><a href="mailto:hello@calorielens.app" class="link-draw text-sm text-base/60 hover:text-base">hello&#64;calorielens.app</a></li>
+              <li><a href="/scan.html" class="link-draw text-sm text-ink/60 hover:text-ink">Full scanner</a></li>
+              <li><a href="mailto:hello@calorielens.app" class="link-draw text-sm text-ink/60 hover:text-ink">hello&#64;calorielens.app</a></li>
             </ul>
           </nav>
 
           <div>
-            <h3 class="text-xs font-medium uppercase tracking-[0.14em] text-base/35">Nutrition note</h3>
-            <p class="mt-5 text-sm leading-relaxed text-base/50">
+            <h3 class="text-xs font-medium uppercase tracking-[0.14em] text-ink/45">Nutrition note</h3>
+            <p class="mt-5 text-sm leading-relaxed text-ink/55">
               CalorieLens estimates nutrition from a photo. Values are approximate and are not a
               substitute for professional dietary advice.
             </p>
           </div>
         </div>
 
-        <p class="mt-14 text-xs text-base/35">
+        <p class="mt-14 text-xs text-ink/45">
           © <span id="footer-year">2026</span> CalorieLens. All rights reserved.
         </p>
       </div>
 
       <p
         id="wordmark"
-        class="mt-10 select-none whitespace-nowrap text-center font-semibold leading-none tracking-tighter text-base/90"
+        class="mt-10 select-none whitespace-nowrap text-center font-semibold leading-none tracking-tighter text-ink/90"
         style="font-size: clamp(2.5rem, 12.2vw, 12rem)"
         aria-hidden="true"
       ></p>

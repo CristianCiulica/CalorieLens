@@ -2,13 +2,13 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>CalorieLens — Scan a meal</title>
+    <title>CalorieLens — Scanner</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="Scan a meal with CalorieLens — drop in a photo and get calories and macros in seconds."
+      content="Scan a meal with CalorieLens — drop in a photo and get calories, macros and your running daily total."
     />
-    <meta name="theme-color" content="#fbfbfd" />
+    <meta name="theme-color" content="#121110" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -18,15 +18,15 @@
     />
   </head>
   <body class="bg-base">
-    <div class="flex min-h-svh flex-col">
+    <div class="flex h-svh flex-col">
       <!-- ==================== BAR ==================== -->
-      <header class="liquid-glass sticky top-0 z-50" style="border-bottom: 1px solid rgba(29, 29, 31, 0.08)">
+      <header class="liquid-glass z-50 shrink-0" style="border-bottom: 1px solid rgba(242, 239, 234, 0.1)">
         <div class="flex h-16 items-center justify-between px-5 sm:px-8">
-          <div class="flex items-center gap-4">
+          <div class="flex min-w-0 items-center gap-4">
             <button
               id="sidebar-toggle"
               type="button"
-              class="group flex h-9 w-9 items-center justify-center rounded-full border border-ink/15 transition-colors hover:border-ink/40"
+              class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-ink/15 transition-colors hover:border-ink/45"
               aria-label="Toggle scan history"
               aria-expanded="true"
             >
@@ -37,50 +37,67 @@
                 <span class="absolute inset-y-0 right-0 w-px bg-ink/30"></span>
               </span>
             </button>
-            <a href="/" class="text-[1.0625rem] font-semibold tracking-tight text-ink">CalorieLens</a>
+            <a href="/" class="truncate text-[1.0625rem] font-semibold tracking-tight text-ink">CalorieLens</a>
+            <span class="index-label hidden sm:block">Scanner</span>
           </div>
 
-          <div class="flex items-center gap-5">
-            <span class="index-label hidden sm:block">Scanner</span>
+          <div class="flex items-center gap-4">
+            <button id="btn-new-scan" type="button" class="btn-line hidden px-5 py-2 text-sm sm:inline-flex">
+              <span class="btn-label">
+                <span>New scan</span>
+                <span aria-hidden="true">New scan</span>
+              </span>
+            </button>
             <a href="/" class="link-draw text-sm font-medium text-ink/55 hover:text-ink">Back to site</a>
           </div>
         </div>
       </header>
 
-      <div class="flex flex-1 overflow-hidden">
-        <!-- ==================== HISTORY ==================== -->
+      <div class="flex min-h-0 flex-1">
+        <!-- ==================== HISTORY RAIL ==================== -->
         <aside id="scanner-sidebar" class="scan-sidebar border-r border-ink/10 bg-surface">
           <div class="flex h-full w-[19rem] flex-col">
-            <div class="px-6 pb-6 pt-8">
-              <button id="btn-new-scan" type="button" class="btn-pill flex w-full px-5 py-3 text-sm">
+            <div class="px-6 pb-5 pt-7">
+              <button id="btn-new-scan-rail" type="button" class="btn-pill flex w-full px-5 py-3 text-sm">
                 <span class="btn-label">
                   <span>New scan</span>
                   <span aria-hidden="true">New scan</span>
                 </span>
               </button>
             </div>
-            <div id="sidebar-history" class="flex-1 overflow-y-auto px-6 pb-10" data-lenis-prevent></div>
+            <div id="sidebar-history" class="min-h-0 flex-1 overflow-y-auto px-6 pb-10"></div>
           </div>
         </aside>
 
         <!-- ==================== WORKSPACE ==================== -->
-        <main class="flex-1 overflow-y-auto">
-          <div class="mx-auto w-full max-w-4xl px-6 pb-32 pt-16 sm:px-10 sm:pt-24">
+        <main class="min-w-0 flex-1 overflow-y-auto">
+          <div class="mx-auto w-full max-w-4xl px-6 pb-28 pt-14 sm:px-10">
             <div class="rule flex items-baseline justify-between pt-6">
-              <p class="index-label">01</p>
-              <p class="index-label">Scan</p>
+              <p id="workspace-index" class="index-label">01</p>
+              <p id="workspace-step" class="index-label">Upload</p>
             </div>
 
-            <h1 class="headline mt-12 text-[clamp(2.5rem,6vw,4rem)] text-ink">Scan your meal.</h1>
-            <p class="mt-6 max-w-lg text-lg text-ink/60">
-              Upload a photo and the model returns calories and macros, item by item.
-            </p>
+            <!-- The day rail is xl-only, so narrow screens get the headline number here. -->
+            <div class="rule mt-5 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 pt-4 xl:hidden">
+              <p class="index-label">Today</p>
+              <p class="text-sm tabular-nums text-ink">
+                <span id="strip-remaining">0</span
+                ><span id="strip-label" class="text-ink/45"> kcal left</span
+                ><span id="strip-eaten" class="text-ink/40"></span>
+              </p>
+            </div>
 
             <!-- ====== IDLE ====== -->
-            <div id="upload-zone" class="mt-14">
+            <section id="upload-zone" class="mt-12">
+              <h1 class="headline text-[clamp(2.25rem,5.5vw,3.5rem)] text-ink">Scan your meal.</h1>
+              <p class="mt-5 max-w-lg text-lg text-ink/60">
+                Drop in a photo of the plate. You get the total, the split and every item the model
+                found — then it lands in today's log.
+              </p>
+
               <label
                 id="dropzone"
-                class="focus-ring-within group relative flex cursor-pointer flex-col items-center justify-center gap-8 rounded-[2rem] bg-surface px-8 py-24 text-center transition-[transform,background-color] duration-500 hover:bg-white sm:py-32"
+                class="focus-ring-within group relative mt-12 flex cursor-pointer flex-col items-center justify-center gap-8 rounded-[2rem] bg-elev-3 px-8 py-24 text-center transition-[transform,background-color] duration-500 hover:bg-elev-6 sm:py-28"
               >
                 <span
                   id="dropzone-frame"
@@ -88,37 +105,68 @@
                   class="pointer-events-none absolute inset-6 rounded-[1.6rem] border border-ink/12 transition-all duration-500 group-hover:inset-4 group-hover:border-ink/30"
                 ></span>
 
-                <span class="text-[3.5rem] font-light leading-none text-ink/30 transition-colors duration-500 group-hover:text-ink" aria-hidden="true">+</span>
+                <span class="text-[3.5rem] font-light leading-none text-ink/40 transition-colors duration-500 group-hover:text-ink" aria-hidden="true">+</span>
                 <span class="space-y-3">
                   <span id="dropzone-title" class="headline block text-2xl text-ink sm:text-3xl">
                     Drag your food photo here
                   </span>
-                  <span class="block text-base text-ink/45">or tap to choose · JPEG, PNG, WebP</span>
+                  <span class="block text-ink/45">or tap to choose · JPEG, PNG, WebP</span>
                 </span>
                 <input id="file-input" type="file" accept="image/*" class="sr-only" aria-label="Upload a photo of your meal" />
               </label>
 
-              <div class="mt-8 flex flex-wrap items-center justify-center gap-4">
+              <div class="mt-8 flex flex-wrap items-center gap-4">
                 <button id="btn-camera" type="button" class="btn-line inline-flex px-7 py-3.5 text-sm">
                   <span class="btn-label">
-                    <span>Take a photo</span>
-                    <span aria-hidden="true">Take a photo</span>
+                    <span>Use the camera</span>
+                    <span aria-hidden="true">Use the camera</span>
                   </span>
                 </button>
-                <p class="text-sm text-ink/40">Uses your device camera.</p>
+                <p class="text-sm text-ink/40">Opens your device camera directly.</p>
               </div>
               <input id="camera-input" type="file" accept="image/*" capture="environment" class="sr-only" aria-label="Take a photo of your meal" />
 
-              <p id="upload-error" hidden class="mt-6 text-center text-base font-medium text-danger" role="alert"></p>
-            </div>
+              <p id="upload-error" hidden class="mt-6 text-base font-medium text-danger" role="alert"></p>
+
+              <!-- The three things that decide whether the read is any good. -->
+              <ul class="mt-20">
+                <li class="rule group last:border-b last:border-b-ink/12">
+                  <div class="grid gap-2 py-6 sm:grid-cols-[4rem_1fr_1.1fr] sm:items-baseline sm:gap-8">
+                    <span class="index-label" aria-hidden="true">01</span>
+                    <h2 class="text-lg font-medium tracking-tight text-ink transition-transform duration-500 group-hover:translate-x-2">Shoot from above</h2>
+                    <p class="text-sm leading-relaxed text-ink/50">A top-down frame shows the whole plate, which is what every portion estimate is built from.</p>
+                  </div>
+                </li>
+                <li class="rule group last:border-b last:border-b-ink/12">
+                  <div class="grid gap-2 py-6 sm:grid-cols-[4rem_1fr_1.1fr] sm:items-baseline sm:gap-8">
+                    <span class="index-label" aria-hidden="true">02</span>
+                    <h2 class="text-lg font-medium tracking-tight text-ink transition-transform duration-500 group-hover:translate-x-2">Keep the plate in shot</h2>
+                    <p class="text-sm leading-relaxed text-ink/50">Its rim is what gives the model scale. Crop it out and grams turn into guesswork.</p>
+                  </div>
+                </li>
+                <li class="rule group last:border-b last:border-b-ink/12">
+                  <div class="grid gap-2 py-6 sm:grid-cols-[4rem_1fr_1.1fr] sm:items-baseline sm:gap-8">
+                    <span class="index-label" aria-hidden="true">03</span>
+                    <h2 class="text-lg font-medium tracking-tight text-ink transition-transform duration-500 group-hover:translate-x-2">One meal per photo</h2>
+                    <p class="text-sm leading-relaxed text-ink/50">Two plates in one frame get read as a single meal. Scan them separately.</p>
+                  </div>
+                </li>
+              </ul>
+            </section>
 
             <!-- ====== PREVIEW ====== -->
-            <div id="preview-section" hidden class="mt-14">
-              <div class="overflow-hidden rounded-[2rem] bg-surface p-2">
+            <section id="preview-section" hidden class="mt-12">
+              <h1 class="headline text-[clamp(2rem,4.5vw,3rem)] text-ink">Ready when you are.</h1>
+              <p class="mt-5 max-w-md text-ink/55">
+                Check that the whole plate is in frame, then send it through.
+              </p>
+
+              <div class="mt-10 overflow-hidden rounded-[2rem] bg-elev-2 p-2">
                 <div class="relative aspect-[4/3] overflow-hidden rounded-[1.6rem]">
                   <img id="preview-image" alt="Meal preview" class="absolute inset-0 h-full w-full object-cover" />
                 </div>
               </div>
+
               <div class="mt-8 flex flex-wrap gap-4">
                 <button id="btn-analyze" type="button" class="btn-pill inline-flex px-8 py-4 text-base" data-magnetic="0.15">
                   <span class="btn-label">
@@ -133,40 +181,52 @@
                   </span>
                 </button>
               </div>
-            </div>
+            </section>
 
             <!-- ====== ANALYZING ====== -->
-            <div id="analyzing-section" hidden class="mt-14">
-              <div class="grid gap-2 overflow-hidden rounded-[2rem] bg-white p-2 sm:grid-cols-2 sm:bg-surface">
+            <section id="analyzing-section" hidden class="mt-12">
+              <div class="grid gap-2 overflow-hidden rounded-[2rem] bg-elev-4 p-2 sm:grid-cols-2 sm:bg-surface">
                 <div class="relative aspect-[4/5] overflow-hidden rounded-[1.6rem] sm:aspect-auto sm:min-h-[420px]">
                   <img id="analyzing-image" alt="Meal being analyzed" class="absolute inset-0 h-full w-full scale-105 object-cover" style="transition: transform 2.4s cubic-bezier(0.22, 1, 0.36, 1)" />
-                  <div class="absolute inset-0 bg-ink/20"></div>
+                  <div class="absolute inset-0 bg-base/55"></div>
                   <div class="scan-sweep" aria-hidden="true"></div>
                 </div>
-                <div class="flex flex-col justify-center rounded-[1.6rem] p-6 sm:bg-white sm:p-12" aria-live="polite">
+                <div class="flex flex-col justify-center rounded-[1.6rem] p-6 sm:bg-elev-4 sm:p-12" aria-live="polite">
                   <div class="flex items-center gap-3 text-ink">
                     <span class="pulse-dot" aria-hidden="true"></span>
                     <span class="text-sm font-medium uppercase tracking-[0.14em]">Analyzing</span>
                   </div>
-                  <p class="headline mt-6 text-3xl text-ink">Reading every item on the plate.</p>
-                  <p class="mt-4 text-base text-ink/50">
-                    Portions are estimated from the frame — plate size, depth, shadow. Usually a
-                    couple of seconds.
+                  <p id="analyzing-stage" class="headline mt-6 text-3xl text-ink">Finding the plate.</p>
+                  <p class="mt-4 text-ink/50">
+                    Segment the plate, size each portion, then price it against the nutrition
+                    database.
                   </p>
+
+                  <ol id="analyzing-steps" class="mt-10 space-y-3">
+                    <li class="flex items-center gap-3 text-sm text-ink/30 transition-colors duration-500">
+                      <span class="h-px w-6 bg-current"></span>Segmenting the plate
+                    </li>
+                    <li class="flex items-center gap-3 text-sm text-ink/30 transition-colors duration-500">
+                      <span class="h-px w-6 bg-current"></span>Estimating portions
+                    </li>
+                    <li class="flex items-center gap-3 text-sm text-ink/30 transition-colors duration-500">
+                      <span class="h-px w-6 bg-current"></span>Totalling macros
+                    </li>
+                  </ol>
                 </div>
               </div>
-            </div>
+            </section>
 
             <!-- ====== RESULTS ====== -->
-            <div id="results-section" hidden class="mt-14">
-              <div class="grid gap-2 overflow-hidden rounded-[2rem] bg-white p-2 sm:grid-cols-2 sm:bg-surface">
+            <section id="results-section" hidden class="mt-12">
+              <div class="grid gap-2 overflow-hidden rounded-[2rem] bg-elev-4 p-2 sm:grid-cols-2 sm:bg-surface">
                 <div class="relative aspect-[4/5] overflow-hidden rounded-[1.6rem] sm:aspect-auto sm:min-h-[460px]">
                   <img id="result-photo-img" alt="Analyzed meal" class="absolute inset-0 h-full w-full object-cover" />
                 </div>
 
-                <div class="flex flex-col justify-center rounded-[1.6rem] p-6 sm:bg-white sm:p-12">
+                <div class="flex flex-col justify-center rounded-[1.6rem] p-6 sm:bg-elev-4 sm:p-12">
                   <p class="index-label">Result</p>
-                  <p id="results-meal-name" class="headline mt-6 text-4xl text-ink sm:text-5xl"></p>
+                  <p id="results-meal-name" class="headline mt-6 hyphens-auto break-words text-2xl text-ink sm:text-3xl lg:text-4xl"></p>
 
                   <div class="mt-10">
                     <div class="flex items-baseline justify-between">
@@ -182,42 +242,95 @@
 
                   <dl id="result-macros" class="mt-10 space-y-6"></dl>
 
-                  <p class="mt-8 text-sm text-ink/40">
-                    An estimate, not a scale reading. Every item below can be checked.
-                  </p>
+                  <p id="result-day-note" class="mt-8 text-sm leading-relaxed text-ink/45"></p>
                 </div>
               </div>
 
-              <ul id="food-items-list" class="mt-10"></ul>
+              <div class="mt-12 flex items-baseline justify-between">
+                <p class="index-label">What it found</p>
+                <p id="result-item-count" class="index-label tabular-nums"></p>
+              </div>
+              <ul id="food-items-list" class="mt-3"></ul>
 
-              <div class="mt-12 flex flex-wrap items-center gap-4">
+              <div class="mt-12 flex flex-wrap gap-4">
                 <button id="btn-scan-again" type="button" class="btn-pill inline-flex px-8 py-4 text-base" data-magnetic="0.15">
                   <span class="btn-label">
                     <span>Scan another meal</span>
                     <span aria-hidden="true">Scan another meal</span>
                   </span>
                 </button>
+                <button id="btn-discard" type="button" class="btn-line inline-flex px-7 py-3.5 text-sm">
+                  <span class="btn-label">
+                    <span>Remove from today</span>
+                    <span aria-hidden="true">Remove from today</span>
+                  </span>
+                </button>
               </div>
-            </div>
+            </section>
 
             <!-- ====== ERROR ====== -->
-            <div id="error-section" hidden class="mt-14">
-              <div class="rounded-[2rem] bg-surface px-8 py-20 text-center sm:px-16">
+            <section id="error-section" hidden class="mt-12">
+              <div class="rounded-[2rem] bg-elev-2 px-8 py-20 text-center sm:px-16">
                 <p class="index-label text-danger">Error</p>
                 <p class="headline mx-auto mt-6 max-w-xl text-3xl text-ink sm:text-4xl">
                   Couldn't analyze that photo.
                 </p>
-                <p id="error-message" class="mx-auto mt-5 max-w-md text-base leading-relaxed text-ink/55"></p>
-                <button id="btn-retry" type="button" class="btn-line mt-10 inline-flex px-7 py-3.5 text-sm">
-                  <span class="btn-label">
-                    <span>Try again</span>
-                    <span aria-hidden="true">Try again</span>
-                  </span>
-                </button>
+                <p id="error-message" class="mx-auto mt-5 max-w-md leading-relaxed text-ink/55"></p>
+                <div class="mt-10 flex flex-wrap justify-center gap-4">
+                  <button id="btn-retry" type="button" class="btn-pill inline-flex px-7 py-3.5 text-sm">
+                    <span class="btn-label">
+                      <span>Try again</span>
+                      <span aria-hidden="true">Try again</span>
+                    </span>
+                  </button>
+                  <button id="btn-error-new" type="button" class="btn-line inline-flex px-7 py-3.5 text-sm">
+                    <span class="btn-label">
+                      <span>Use another photo</span>
+                      <span aria-hidden="true">Use another photo</span>
+                    </span>
+                  </button>
+                </div>
               </div>
-            </div>
+            </section>
           </div>
         </main>
+
+        <!-- ==================== TODAY RAIL ==================== -->
+        <aside class="hidden w-[21rem] shrink-0 overflow-y-auto border-l border-ink/10 bg-surface xl:block">
+          <div class="px-7 py-8">
+            <div class="flex items-baseline justify-between">
+              <p class="index-label">Today</p>
+              <p id="day-date" class="index-label tabular-nums"></p>
+            </div>
+
+            <p class="mt-7 text-[3.25rem] font-semibold leading-none tracking-tighter tabular-nums text-ink">
+              <span id="day-remaining">0</span>
+            </p>
+            <p id="day-remaining-label" class="mt-3 text-sm text-ink/50"></p>
+
+            <div class="mt-7 h-px w-full bg-ink/10">
+              <div id="day-bar" class="h-[3px] -translate-y-[1px] origin-left transition-[width] duration-700 ease-out" style="width: 0%"></div>
+            </div>
+            <p id="day-eaten" class="mt-3 text-xs tabular-nums text-ink/40"></p>
+
+            <dl id="day-macros" class="mt-10 space-y-6"></dl>
+
+            <div class="rule mt-10 pt-6">
+              <p class="index-label">Goal</p>
+              <div class="mt-4 flex flex-wrap gap-2" role="group" aria-label="Choose a goal">
+                <button type="button" data-goal="cut" class="btn-line inline-flex px-4 py-2 text-xs">Cut</button>
+                <button type="button" data-goal="maintain" class="btn-line inline-flex px-4 py-2 text-xs">Maintain</button>
+                <button type="button" data-goal="build" class="btn-line inline-flex px-4 py-2 text-xs">Build</button>
+              </div>
+              <p id="day-goal-note" class="mt-5 text-sm leading-relaxed text-ink/45"></p>
+            </div>
+
+            <div class="rule mt-10 pt-6">
+              <p class="index-label">Logged today</p>
+              <ul id="day-log" class="mt-2"></ul>
+            </div>
+          </div>
+        </aside>
       </div>
     </div>
 

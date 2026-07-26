@@ -3,6 +3,7 @@ import { gsap } from './core/gsap';
 import { reducedMotion } from './core/motion';
 import { initMagnetic } from './core/motion-attrs';
 import { analyzeMeal, type MealAnalysis } from './core/analyze';
+import { GOALS, MACROS, itemRowsHtml, macroRowsHtml } from './core/nutrition';
 
 type ScannerState = 'idle' | 'preview' | 'analyzing' | 'results' | 'error';
 
@@ -14,8 +15,10 @@ const $ = <T extends HTMLElement>(id: string): T => document.getElementById(id) 
 
 const sidebarToggle = $('sidebar-toggle');
 const sidebar = $('scanner-sidebar');
-const btnNewScan = $('btn-new-scan');
 const historyList = $('sidebar-history');
+
+const workspaceIndex = $('workspace-index');
+const workspaceStep = $('workspace-step');
 
 const uploadZone = $('upload-zone');
 const dropzone = $<HTMLLabelElement>('dropzone');
@@ -23,16 +26,15 @@ const dropzoneFrame = $('dropzone-frame');
 const dropzoneTitle = $('dropzone-title');
 const fileInput = $<HTMLInputElement>('file-input');
 const cameraInput = $<HTMLInputElement>('camera-input');
-const btnCamera = $('btn-camera');
 const uploadError = $('upload-error');
 
 const previewSection = $('preview-section');
 const previewImage = $<HTMLImageElement>('preview-image');
-const btnAnalyze = $('btn-analyze');
-const btnChange = $('btn-change');
 
 const analyzingSection = $('analyzing-section');
 const analyzingImage = $<HTMLImageElement>('analyzing-image');
+const analyzingStage = $('analyzing-stage');
+const analyzingSteps = $('analyzing-steps');
 
 const resultsSection = $('results-section');
 const resultPhoto = $<HTMLImageElement>('result-photo-img');
@@ -40,12 +42,32 @@ const resultsMealName = $('results-meal-name');
 const totalCalories = $('total-calories');
 const totalBar = $('total-bar');
 const resultMacros = $('result-macros');
+const resultDayNote = $('result-day-note');
+const resultItemCount = $('result-item-count');
 const foodItemsList = $('food-items-list');
-const btnScanAgain = $('btn-scan-again');
 
 const errorSection = $('error-section');
 const errorMessage = $('error-message');
-const btnRetry = $('btn-retry');
+
+const dayDate = $('day-date');
+const dayRemaining = $('day-remaining');
+const dayRemainingLabel = $('day-remaining-label');
+const dayBar = $('day-bar');
+const dayEaten = $('day-eaten');
+const dayMacros = $('day-macros');
+const dayGoalNote = $('day-goal-note');
+const dayLog = $('day-log');
+const stripRemaining = $('strip-remaining');
+const stripLabel = $('strip-label');
+const stripEaten = $('strip-eaten');
+
+const STEP_LABELS: Record<ScannerState, [string, string]> = {
+  idle: ['01', 'Upload'],
+  preview: ['02', 'Confirm'],
+  analyzing: ['03', 'Analyzing'],
+  results: ['04', 'Breakdown'],
+  error: ['—', 'Error'],
+};
 
 // ============================================================
 // State
@@ -54,6 +76,8 @@ const btnRetry = $('btn-retry');
 let selectedFile: File | null = null;
 let selectedImageUrl = '';
 let activeHistoryId: string | null = null;
+let goalKey = localStorage.getItem('calorielens-goal') ?? 'maintain';
+if (!GOALS[goalKey]) goalKey = 'maintain';
 
 const scanHistory: MealAnalysis[] = [
   {
@@ -61,7 +85,7 @@ const scanHistory: MealAnalysis[] = [
     meal_name: 'Mediterranean Chicken Bowl',
     timestamp: '12:45 PM',
     date_group: 'Today',
-    image_url: '/hero-mockup.jpg',
+    image_url: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&q=80',
     total_calories: 628,
     total_protein: 34,
     total_carbs: 52,
@@ -110,30 +134,26 @@ const scanHistory: MealAnalysis[] = [
 ];
 
 // ============================================================
-// Sidebar — hairline rows, grouped by day. No boxes, no shadows.
+// Sidebar — open in the flow on wide screens, off-canvas below lg.
 // ============================================================
 
-// Open by default on wide screens; off-canvas on anything narrower.
 const wideScreen = window.matchMedia('(min-width: 1024px)');
 let sidebarOpen = wideScreen.matches;
-wideScreen.addEventListener('change', (e) => {
-  sidebarOpen = e.matches;
-  paintSidebar();
-});
 
 function paintSidebar(): void {
   sidebar.classList.toggle('is-closed', !sidebarOpen);
   sidebarToggle.setAttribute('aria-expanded', String(sidebarOpen));
 }
 
+wideScreen.addEventListener('change', (e) => {
+  sidebarOpen = e.matches;
+  paintSidebar();
+});
 sidebarToggle.addEventListener('click', () => {
   sidebarOpen = !sidebarOpen;
   paintSidebar();
 });
-
 paintSidebar();
-
-btnNewScan.addEventListener('click', () => resetScanner());
 
 function renderHistory(): void {
   if (!scanHistory.length) {
@@ -173,7 +193,7 @@ function renderHistory(): void {
                   src="${item.image_url}"
                   alt=""
                   class="h-11 w-11 shrink-0 rounded-xl object-cover"
-                  onerror="this.src='/hero-mockup.jpg'"
+                  onerror="this.style.visibility='hidden'"
                 />
                 <span class="min-w-0 flex-1">
                   <span class="block truncate text-sm font-medium tracking-tight text-ink transition-transform duration-500 group-hover:translate-x-1">${item.meal_name}</span>
@@ -201,6 +221,94 @@ function renderHistory(): void {
 }
 
 // ============================================================
+// Today rail — the running total is what turns a scanner into a tracker.
+// ============================================================
+
+function todayMeals(): MealAnalysis[] {
+  return scanHistory.filter((m) => m.date_group === 'Today');
+}
+
+function renderDay(): void {
+  const goal = GOALS[goalKey];
+  const meals = todayMeals();
+
+  const eaten = meals.reduce((a, m) => a + m.total_calories, 0);
+  const remaining = goal.calories - eaten;
+  const over = remaining < 0;
+
+  dayDate.textContent = new Date().toLocaleDateString('en-US', {
+    day: 'numeric',
+    month: 'short',
+  });
+
+  dayRemaining.textContent = Math.abs(remaining).toLocaleString('en-US');
+  dayRemaining.style.color = over ? 'var(--color-fat)' : 'var(--color-ink)';
+  dayRemainingLabel.textContent = over ? 'kcal over target' : 'kcal left today';
+  dayEaten.textContent = `${eaten.toLocaleString('en-US')} of ${goal.calories.toLocaleString('en-US')} kcal`;
+
+  dayBar.style.width = `${Math.min(100, (eaten / goal.calories) * 100)}%`;
+  dayBar.style.background = over ? 'var(--color-fat)' : 'rgba(242, 239, 234, 0.75)';
+
+  stripRemaining.textContent = Math.abs(remaining).toLocaleString('en-US');
+  stripRemaining.style.color = over ? 'var(--color-fat)' : 'var(--color-ink)';
+  stripLabel.textContent = over ? ' kcal over' : ' kcal left';
+  stripEaten.textContent = ` · ${eaten.toLocaleString('en-US')} of ${goal.calories.toLocaleString('en-US')}`;
+
+  // Macro progress against the goal, same hairline language as the readout.
+  dayMacros.innerHTML = MACROS.map((macro) => {
+    const key = macro.key.replace('total_', '') as 'protein' | 'carbs' | 'fat';
+    const consumed = meals.reduce((a, m) => a + (m[macro.key] ?? 0), 0);
+    const target = goal[key];
+    const pct = Math.min(100, (consumed / target) * 100);
+    return `
+      <div>
+        <div class="flex items-baseline justify-between">
+          <dt class="text-sm text-ink/50">${macro.label}</dt>
+          <dd class="text-sm font-medium tabular-nums text-ink">${consumed}<span class="text-ink/40">/${target}g</span></dd>
+        </div>
+        <div class="mt-2 h-px w-full bg-ink/10">
+          <div class="h-[2px] -translate-y-[0.5px] origin-left transition-[width] duration-700 ease-out" style="width: ${pct}%; background: ${macro.color}"></div>
+        </div>
+      </div>`;
+  }).join('');
+
+  dayGoalNote.textContent = goal.note;
+
+  dayLog.innerHTML = meals.length
+    ? meals
+        .map(
+          (m) => `
+        <li class="rule last:border-b last:border-b-ink/12">
+          <div class="flex items-baseline justify-between gap-4 py-3">
+            <span class="min-w-0 truncate text-sm text-ink/70">${m.meal_name}</span>
+            <span class="shrink-0 text-sm tabular-nums text-ink/45">${m.total_calories}</span>
+          </div>
+        </li>`,
+        )
+        .join('')
+    : '<li class="py-3 text-sm text-ink/40">Nothing logged yet.</li>';
+}
+
+function paintGoalButtons(): void {
+  document.querySelectorAll<HTMLButtonElement>('[data-goal]').forEach((btn) => {
+    const on = btn.dataset.goal === goalKey;
+    btn.classList.toggle('btn-line', !on);
+    btn.classList.toggle('btn-pill', on);
+    btn.setAttribute('aria-pressed', String(on));
+  });
+}
+
+document.querySelectorAll<HTMLButtonElement>('[data-goal]').forEach((btn) =>
+  btn.addEventListener('click', () => {
+    if (!btn.dataset.goal) return;
+    goalKey = btn.dataset.goal;
+    localStorage.setItem('calorielens-goal', goalKey);
+    paintGoalButtons();
+    renderDay();
+  }),
+);
+
+// ============================================================
 // State machine
 // ============================================================
 
@@ -210,7 +318,10 @@ function setState(next: ScannerState): void {
   analyzingSection.hidden = next !== 'analyzing';
   resultsSection.hidden = next !== 'results';
   errorSection.hidden = next !== 'error';
+
+  [workspaceIndex.textContent, workspaceStep.textContent] = STEP_LABELS[next];
   if (next === 'idle') uploadError.hidden = true;
+  document.querySelector('main')?.scrollTo({ top: 0 });
 }
 
 // ============================================================
@@ -219,7 +330,7 @@ function setState(next: ScannerState): void {
 
 function setDragOver(over: boolean): void {
   dropzone.classList.toggle('scale-[0.985]', over);
-  dropzone.classList.toggle('bg-white', over);
+  dropzone.classList.toggle('bg-elev-6', over);
   dropzoneFrame.classList.toggle('inset-3', over);
   dropzoneFrame.classList.toggle('border-ink', over);
   dropzoneFrame.classList.toggle('inset-6', !over);
@@ -249,7 +360,24 @@ function handleFile(file: File): void {
   }
 }
 
-btnCamera.addEventListener('click', () => cameraInput.click());
+$('btn-camera').addEventListener('click', () => cameraInput.click());
+$('btn-new-scan').addEventListener('click', () => resetScanner());
+$('btn-new-scan-rail').addEventListener('click', () => resetScanner());
+$('btn-change').addEventListener('click', () => setState('idle'));
+$('btn-scan-again').addEventListener('click', () => resetScanner());
+$('btn-error-new').addEventListener('click', () => resetScanner());
+$('btn-analyze').addEventListener('click', () => selectedFile && void runAnalysis(selectedFile));
+$('btn-retry').addEventListener('click', () => {
+  if (selectedFile) void runAnalysis(selectedFile);
+  else resetScanner();
+});
+
+// Undo: drop the scan just logged back out of today.
+$('btn-discard').addEventListener('click', () => {
+  const index = scanHistory.findIndex((m) => m.id === activeHistoryId);
+  if (index >= 0) scanHistory.splice(index, 1);
+  resetScanner();
+});
 
 fileInput.addEventListener('change', () => {
   const file = fileInput.files?.[0];
@@ -278,14 +406,6 @@ dropzone.addEventListener('drop', (e) => {
   if (file) handleFile(file);
 });
 
-btnAnalyze.addEventListener('click', () => selectedFile && void runAnalysis(selectedFile));
-btnChange.addEventListener('click', () => setState('idle'));
-btnScanAgain.addEventListener('click', () => resetScanner());
-btnRetry.addEventListener('click', () => {
-  if (selectedFile) void runAnalysis(selectedFile);
-  else resetScanner();
-});
-
 function resetScanner(): void {
   selectedFile = null;
   activeHistoryId = null;
@@ -293,6 +413,7 @@ function resetScanner(): void {
   selectedImageUrl = '';
   foodItemsList.innerHTML = '';
   renderHistory();
+  renderDay();
   setState('idle');
 }
 
@@ -300,8 +421,31 @@ function resetScanner(): void {
 // Analysis
 // ============================================================
 
+const STAGES = ['Finding the plate.', 'Sizing each portion.', 'Totalling the macros.'];
+
+/** Walks the three stage labels while the request is in flight. */
+function runStages(): () => void {
+  const steps = [...analyzingSteps.children] as HTMLElement[];
+  let i = 0;
+
+  const advance = (): void => {
+    analyzingStage.textContent = STAGES[i];
+    steps.forEach((step, n) => {
+      step.classList.toggle('text-ink/30', n > i);
+      step.classList.toggle('text-ink', n === i);
+      step.classList.toggle('text-ink/55', n < i);
+    });
+    i = Math.min(i + 1, STAGES.length - 1);
+  };
+
+  advance();
+  const timer = window.setInterval(advance, 900);
+  return () => window.clearInterval(timer);
+}
+
 async function runAnalysis(file: File): Promise<void> {
   setState('analyzing');
+  const stopStages = runStages();
 
   try {
     const analysis = await analyzeMeal(file);
@@ -318,6 +462,8 @@ async function runAnalysis(file: File): Promise<void> {
     errorMessage.textContent =
       err instanceof Error ? err.message : 'An unexpected error occurred.';
     setState('error');
+  } finally {
+    stopStages();
   }
 }
 
@@ -325,51 +471,40 @@ async function runAnalysis(file: File): Promise<void> {
 // Results — the total counts up, every bar draws in from the left.
 // ============================================================
 
-const MACROS = [
-  { key: 'total_protein', label: 'Protein', kcalPerGram: 4, color: 'var(--color-protein)' },
-  { key: 'total_carbs', label: 'Carbs', kcalPerGram: 4, color: 'var(--color-carbs)' },
-  { key: 'total_fat', label: 'Fat', kcalPerGram: 9, color: 'var(--color-fat)' },
-] as const;
+/** Staggers freshly injected rows in; the end state needs no animation. */
+function revealRows(list: HTMLElement): void {
+  const rows = [...list.children] as HTMLElement[];
+  rows.forEach((row, i) => {
+    row.classList.add('row-enter');
+    row.style.transitionDelay = `${0.2 + i * 0.05}s`;
+  });
+
+  requestAnimationFrame(() => {
+    rows.forEach((row) => {
+      row.classList.add('row-enter-active');
+      row.classList.remove('row-enter');
+    });
+  });
+}
 
 function displayResults(analysis: MealAnalysis): void {
-  resultPhoto.src = analysis.image_url || selectedImageUrl || '/hero-mockup.jpg';
+  resultPhoto.src = analysis.image_url || selectedImageUrl;
   resultsMealName.textContent = analysis.meal_name;
+  resultMacros.innerHTML = macroRowsHtml(analysis);
+  foodItemsList.innerHTML = itemRowsHtml(analysis);
+  resultItemCount.textContent = `${analysis.items.length} item${analysis.items.length === 1 ? '' : 's'}`;
 
-  const macroKcal = MACROS.map((m) => (analysis[m.key] ?? 0) * m.kcalPerGram);
-  const macroTotal = macroKcal.reduce((a, b) => a + b, 0) || 1;
-
-  resultMacros.innerHTML = MACROS.map((macro, i) => {
-    const grams = analysis[macro.key] ?? 0;
-    const share = (macroKcal[i] / macroTotal) * 100;
-    return `
-      <div>
-        <div class="flex items-baseline justify-between">
-          <dt class="text-sm text-ink/50">${macro.label}</dt>
-          <dd class="text-base font-medium tabular-nums text-ink">${grams}<span class="text-ink/40">g</span></dd>
-        </div>
-        <div class="mt-2 h-px w-full bg-ink/10">
-          <div data-macro-bar class="h-[2px] -translate-y-[0.5px] origin-left" style="width: ${share}%; background: ${macro.color}"></div>
-        </div>
-      </div>`;
-  }).join('');
-
-  foodItemsList.innerHTML = analysis.items
-    .map(
-      (item, i) => `
-      <li class="rule group last:border-b last:border-b-ink/12">
-        <div class="grid gap-2 py-6 sm:grid-cols-[4rem_1fr_auto] sm:items-baseline sm:gap-8">
-          <span class="index-label" aria-hidden="true">${String(i + 1).padStart(2, '0')}</span>
-          <div>
-            <p class="text-lg font-medium tracking-tight text-ink transition-transform duration-500 group-hover:translate-x-2">${item.name}</p>
-            <p class="mt-1 text-sm text-ink/45">${item.portion} · ${item.protein}g protein · ${item.carbs}g carbs · ${item.fat}g fat</p>
-          </div>
-          <p class="text-lg font-medium tabular-nums tracking-tight text-ink">${item.calories}<span class="text-ink/40"> kcal</span></p>
-        </div>
-      </li>`,
-    )
-    .join('');
+  // Tie the meal back to the day it just landed in.
+  const goal = GOALS[goalKey];
+  const eaten = todayMeals().reduce((a, m) => a + m.total_calories, 0);
+  const left = goal.calories - eaten;
+  resultDayNote.textContent =
+    left >= 0
+      ? `Logged to today. ${left.toLocaleString('en-US')} kcal left against your ${goal.label.toLowerCase()} target.`
+      : `Logged to today. That puts you ${Math.abs(left).toLocaleString('en-US')} kcal over your ${goal.label.toLowerCase()} target.`;
 
   setState('results');
+  renderDay();
   initMagnetic();
 
   if (reducedMotion()) {
@@ -387,16 +522,15 @@ function displayResults(analysis: MealAnalysis): void {
         (totalCalories.textContent = Math.round(state.value).toLocaleString('en-US')),
     });
 
-    gsap.from(totalBar, { scaleX: 0, duration: 1.6, ease: 'power3.out' });
-    gsap.from('[data-macro-bar]', { scaleX: 0, duration: 1.4, ease: 'power3.out', stagger: 0.08 });
-    gsap.from(foodItemsList.children, {
-      y: 18,
-      autoAlpha: 0,
-      duration: 0.9,
+    gsap.from(totalBar, { scaleX: 0, duration: 1.6, ease: 'power3.out', clearProps: 'transform' });
+    gsap.from('[data-macro-bar]', {
+      scaleX: 0,
+      duration: 1.4,
       ease: 'power3.out',
-      stagger: 0.05,
-      delay: 0.2,
+      stagger: 0.08,
+      clearProps: 'transform',
     });
+    revealRows(foodItemsList);
   });
 }
 
@@ -404,6 +538,8 @@ function displayResults(analysis: MealAnalysis): void {
 // Boot
 // ============================================================
 
+paintGoalButtons();
 renderHistory();
+renderDay();
 setState('idle');
 initMagnetic();

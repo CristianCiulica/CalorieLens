@@ -3,23 +3,45 @@
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
 
-  /* One ink, one paper, one accent. Nothing else competes. */
-  --color-base: #fbfbfd;
-  --color-surface: #f5f5f7;
-  --color-ink: #1d1d1f;
-  --color-muted: #86868b;
-  --color-accent: #0071e3;
+  /* ---------- Dark theme, built on the Material dark surface model ----------
+     Material recommends a dark grey ground rather than black: black hides
+     elevation, kills shadows and strains the eye on long scrolls. The ground
+     here is #121110 — Material's #121212 pulled a hair warm, so the whole
+     page sits closer to paper stock than to a terminal.
 
-  /* Macro colors — sober, clinical, used only inside the scanner readout. */
-  --color-protein: #1d7f4f;
-  --color-carbs: #0071e3;
-  --color-fat: #b25e00;
-  --color-danger: #d70015;
+     Elevation is expressed by compositing white over that ground at the
+     opacities Material specifies per dp — 5% at 01dp up to 16% at 24dp.
+     Higher surface == lighter surface. The steps below are pre-composited. */
+  --color-base: #121110; /* 00dp — the page */
+  --color-surface: #1e1d1c; /* 01dp — full-width bands */
+  --color-elev-2: #232221; /* 02dp */
+  --color-elev-3: #252423; /* 03dp — cards on a band */
+  --color-elev-4: #272626; /* 04dp — panels */
+  --color-elev-6: #2c2b2a; /* 06dp — hover / raised panels */
+  --color-elev-8: #2e2d2d; /* 08dp — the bar */
+  --color-elev-24: #383736; /* 24dp — the closing block */
+
+  /* Text. Material asks body copy to clear 15.8:1 on the ground so it still
+     passes 4.5:1 once a surface is elevated under it. This warm white lands
+     at 16.6:1; the /60 and /38 steps are the medium and disabled emphases. */
+  --color-ink: #f2efea;
+  --color-muted: #9a958d;
+
+  /* Chroma is rationed. Saturated hues vibrate against a dark ground, so
+     every colour here is a light, desaturated tone — and all three are taken
+     from food rather than from a UI palette: leaf, wheat, clay. */
+  --color-accent: #d9b778;
+  --color-protein: #9dbe87;
+  --color-carbs: #d9b778;
+  --color-fat: #c88a66;
+  --color-danger: #e5707a;
 }
 
 html {
   scroll-behavior: initial;
   scroll-padding-top: 6rem;
+  /* Native form controls, scrollbars and the caret follow the theme. */
+  color-scheme: dark;
 }
 
 :focus-visible {
@@ -104,24 +126,26 @@ html.lenis body {
   padding-block: clamp(6rem, 11vw, 10rem);
 }
 
-/* Hairline rules structure the page instead of boxes and shadows. */
+/* Hairline rules structure the page instead of boxes and shadows.
+   12% white is Material's divider opacity for dark surfaces. */
 .rule {
-  border-top: 1px solid rgba(29, 29, 31, 0.12);
+  border-top: 1px solid rgba(242, 239, 234, 0.12);
 }
 
-/* Liquid glass — frosted surface the page shows through. The inner top
-   highlight and slight saturation boost give it the "wet glass" read
-   instead of plain transparency. */
+/* Liquid glass — the bar reads as an 08dp surface, so it is that surface
+   at 72% with the page blurred through it. The inner top highlight is the
+   only thing doing "glass"; on a dark ground a drop shadow would be
+   invisible, so elevation comes from the lighter tone instead. */
 .liquid-glass {
-  background-color: #ffffff;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.65),
-    0 12px 40px -20px rgba(29, 29, 31, 0.25);
+  background-color: rgba(46, 45, 45, 0.72);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  box-shadow: inset 0 1px 0 rgba(242, 239, 234, 0.08);
 }
 
 /* ---------- Interactive primitives ---------- */
 
-/* Primary pill — ink on paper. Label slides on hover (see .btn-label).
+/* Primary pill — paper on ground. Label slides on hover (see .btn-label).
    Sets no display so Tailwind's hidden/inline-flex utilities keep control. */
 .btn-pill {
   position: relative;
@@ -139,7 +163,7 @@ html.lenis body {
   will-change: transform;
 }
 .btn-pill:hover {
-  background: #000;
+  background: #ffffff;
 }
 .btn-pill:active {
   transform: scale(0.97);
@@ -156,7 +180,7 @@ html.lenis body {
   justify-content: center;
   overflow: hidden;
   border-radius: 9999px;
-  border: 1px solid rgba(29, 29, 31, 0.25);
+  border: 1px solid rgba(242, 239, 234, 0.28);
   color: var(--color-ink);
   font-weight: 500;
   letter-spacing: -0.01em;
@@ -168,7 +192,7 @@ html.lenis body {
 }
 .btn-line:hover {
   border-color: var(--color-ink);
-  background: rgba(29, 29, 31, 0.04);
+  background: rgba(242, 239, 234, 0.07);
 }
 .btn-line:active {
   transform: scale(0.97);
@@ -246,16 +270,31 @@ html.lenis body {
   will-change: transform;
 }
 
+/* Row entrance for injected lists. Deliberately CSS rather than a tween:
+   the resting state is "visible", so if the transition never runs — a
+   throttled tab, reduced motion — the content is still there. */
+.row-enter {
+  opacity: 0;
+  transform: translateY(18px);
+}
+.row-enter-active {
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 /* Word-stagger reveal targets */
 .reveal-word {
   display: inline-block;
   will-change: transform, opacity, filter;
 }
 
-/* Scrubbed manifesto words */
+/* Scrubbed manifesto words. The resting state is higher than the light
+   theme's 12% — dimmed white falls off a dark ground much faster than
+   dimmed black falls off paper. */
 .scrub-word {
   display: inline-block;
-  opacity: 0.12;
+  opacity: 0.18;
   will-change: opacity;
 }
 
@@ -265,8 +304,8 @@ html.lenis body {
   left: 0;
   right: 0;
   height: 1px;
-  background: rgba(251, 251, 253, 0.95);
-  box-shadow: 0 0 24px 6px rgba(251, 251, 253, 0.5);
+  background: rgba(242, 239, 234, 0.95);
+  box-shadow: 0 0 24px 6px rgba(242, 239, 234, 0.45);
   animation: scanSweep 2.2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
 }
 @keyframes scanSweep {
@@ -336,7 +375,7 @@ html.lenis body {
     left: 0;
     z-index: 40;
     width: 19rem;
-    box-shadow: 0 24px 60px -30px rgba(29, 29, 31, 0.45);
+    box-shadow: 0 24px 60px -24px rgba(0, 0, 0, 0.7);
   }
   .scan-sidebar.is-closed {
     width: 19rem;
@@ -363,11 +402,11 @@ html.lenis body {
   background: var(--color-base);
 }
 ::-webkit-scrollbar-thumb {
-  background: #d2d2d7;
+  background: #3a3938;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #86868b;
+  background: #55524f;
 }
 
 @media (prefers-reduced-motion: reduce) {
