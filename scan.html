@@ -1,215 +1,224 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
+    <meta charset="utf-8" />
+    <title>CalorieLens — Scan a meal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Scan a meal with CalorieLens — drop in a photo and get calories and macros in seconds."
+    />
+    <meta name="theme-color" content="#fbfbfd" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Scan your meal with CalorieLens AI — get instant calorie and macro breakdowns from a photo." />
-    <title>CalorieLens — Scan Your Meal</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..800&display=swap"
+      rel="stylesheet"
+    />
   </head>
-  <body>
-    <div class="scanner-page">
-
-      <!-- Nav Bar -->
-      <nav class="scanner-nav">
-        <div class="nav-left">
-          <button id="sidebar-toggle" class="sidebar-toggle-btn" aria-label="Toggle history sidebar" title="Toggle history sidebar">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-              <line x1="9" y1="3" x2="9" y2="21"></line>
-            </svg>
-          </button>
-          <a href="/" class="logo">
-            <svg class="logo-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <circle cx="12" cy="12" r="4"></circle>
-            </svg>
-            CalorieLens
-          </a>
-        </div>
-
-        <div class="nav-right">
-          <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle theme" title="Toggle light/dark theme">
-            <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="5"></circle>
-              <line x1="12" y1="1" x2="12" y2="3"></line>
-              <line x1="12" y1="21" x2="12" y2="23"></line>
-              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-              <line x1="1" y1="12" x2="3" y2="12"></line>
-              <line x1="21" y1="12" x2="23" y2="12"></line>
-              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-            </svg>
-            <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-            </svg>
-          </button>
-          <a href="/" class="back-link">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"></path><polyline points="12 19 5 12 12 5"></polyline></svg>
-            Back
-          </a>
-        </div>
-      </nav>
-
-      <!-- App Layout: Sidebar + Main Content -->
-      <div class="scanner-layout">
-
-        <!-- Left Sidebar: Past Conversations / Meal Scans -->
-        <aside id="scanner-sidebar" class="scanner-sidebar">
-          <div class="sidebar-header">
-            <button id="btn-new-scan" class="btn-new-scan">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="12" y1="5" x2="12" y2="19"></line>
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-              </svg>
-              New Scan
+  <body class="bg-base">
+    <div class="flex min-h-svh flex-col">
+      <!-- ==================== BAR ==================== -->
+      <header class="liquid-glass sticky top-0 z-50" style="border-bottom: 1px solid rgba(29, 29, 31, 0.08)">
+        <div class="flex h-16 items-center justify-between px-5 sm:px-8">
+          <div class="flex items-center gap-4">
+            <button
+              id="sidebar-toggle"
+              type="button"
+              class="group flex h-9 w-9 items-center justify-center rounded-full border border-ink/15 transition-colors hover:border-ink/40"
+              aria-label="Toggle scan history"
+              aria-expanded="true"
+            >
+              <span class="relative block h-3.5 w-4" aria-hidden="true">
+                <span class="absolute inset-y-0 left-0 w-px bg-ink/70"></span>
+                <span class="absolute inset-x-0 top-0 h-px bg-ink/30"></span>
+                <span class="absolute inset-x-0 bottom-0 h-px bg-ink/30"></span>
+                <span class="absolute inset-y-0 right-0 w-px bg-ink/30"></span>
+              </span>
             </button>
+            <a href="/" class="text-[1.0625rem] font-semibold tracking-tight text-ink">CalorieLens</a>
           </div>
-          <div class="sidebar-history" id="sidebar-history">
-            <!-- Dynamic history list rendered by JS -->
+
+          <div class="flex items-center gap-5">
+            <span class="index-label hidden sm:block">Scanner</span>
+            <a href="/" class="link-draw text-sm font-medium text-ink/55 hover:text-ink">Back to site</a>
+          </div>
+        </div>
+      </header>
+
+      <div class="flex flex-1 overflow-hidden">
+        <!-- ==================== HISTORY ==================== -->
+        <aside id="scanner-sidebar" class="scan-sidebar border-r border-ink/10 bg-surface">
+          <div class="flex h-full w-[19rem] flex-col">
+            <div class="px-6 pb-6 pt-8">
+              <button id="btn-new-scan" type="button" class="btn-pill flex w-full px-5 py-3 text-sm">
+                <span class="btn-label">
+                  <span>New scan</span>
+                  <span aria-hidden="true">New scan</span>
+                </span>
+              </button>
+            </div>
+            <div id="sidebar-history" class="flex-1 overflow-y-auto px-6 pb-10" data-lenis-prevent></div>
           </div>
         </aside>
 
-        <!-- Main Workspace -->
-        <main class="scanner-main">
-          <div class="scanner-body">
-
-            <!-- Title -->
-            <h1 class="scanner-title">Scan your meal</h1>
-            <p class="scanner-subtitle">Upload a photo and let AI analyze the calories & macros.</p>
-
-            <!-- ====== IDLE STATE: Upload Zone ====== -->
-            <div id="upload-zone" class="upload-zone">
-              <div class="upload-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-                  <circle cx="12" cy="13" r="4"></circle>
-                </svg>
-              </div>
-              <p class="upload-title">Drop your food photo here</p>
-              <p class="upload-hint">or choose an option below</p>
-              <div class="upload-actions">
-                <button class="upload-btn upload-btn-primary" id="btn-upload">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                  Upload Photo
-                </button>
-                <button class="upload-btn upload-btn-secondary" id="btn-camera">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-                  Take Photo
-                </button>
-              </div>
-              <input type="file" accept="image/*" class="file-input" id="file-input" />
-              <input type="file" accept="image/*" capture="environment" class="file-input" id="camera-input" />
+        <!-- ==================== WORKSPACE ==================== -->
+        <main class="flex-1 overflow-y-auto">
+          <div class="mx-auto w-full max-w-4xl px-6 pb-32 pt-16 sm:px-10 sm:pt-24">
+            <div class="rule flex items-baseline justify-between pt-6">
+              <p class="index-label">01</p>
+              <p class="index-label">Scan</p>
             </div>
 
-            <!-- ====== PREVIEW STATE ====== -->
-            <div id="preview-section" class="preview-section">
-              <div class="preview-image-wrap">
-                <img id="preview-image" src="" alt="Food preview" />
-              </div>
-              <div class="preview-actions">
-                <button class="upload-btn upload-btn-primary" id="btn-analyze">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                  Analyze Meal
+            <h1 class="headline mt-12 text-[clamp(2.5rem,6vw,4rem)] text-ink">Scan your meal.</h1>
+            <p class="mt-6 max-w-lg text-lg text-ink/60">
+              Upload a photo and the model returns calories and macros, item by item.
+            </p>
+
+            <!-- ====== IDLE ====== -->
+            <div id="upload-zone" class="mt-14">
+              <label
+                id="dropzone"
+                class="focus-ring-within group relative flex cursor-pointer flex-col items-center justify-center gap-8 rounded-[2rem] bg-surface px-8 py-24 text-center transition-[transform,background-color] duration-500 hover:bg-white sm:py-32"
+              >
+                <span
+                  id="dropzone-frame"
+                  aria-hidden="true"
+                  class="pointer-events-none absolute inset-6 rounded-[1.6rem] border border-ink/12 transition-all duration-500 group-hover:inset-4 group-hover:border-ink/30"
+                ></span>
+
+                <span class="text-[3.5rem] font-light leading-none text-ink/30 transition-colors duration-500 group-hover:text-ink" aria-hidden="true">+</span>
+                <span class="space-y-3">
+                  <span id="dropzone-title" class="headline block text-2xl text-ink sm:text-3xl">
+                    Drag your food photo here
+                  </span>
+                  <span class="block text-base text-ink/45">or tap to choose · JPEG, PNG, WebP</span>
+                </span>
+                <input id="file-input" type="file" accept="image/*" class="sr-only" aria-label="Upload a photo of your meal" />
+              </label>
+
+              <div class="mt-8 flex flex-wrap items-center justify-center gap-4">
+                <button id="btn-camera" type="button" class="btn-line inline-flex px-7 py-3.5 text-sm">
+                  <span class="btn-label">
+                    <span>Take a photo</span>
+                    <span aria-hidden="true">Take a photo</span>
+                  </span>
                 </button>
-                <button class="upload-btn upload-btn-secondary" id="btn-change">
-                  Change Photo
-                </button>
+                <p class="text-sm text-ink/40">Uses your device camera.</p>
               </div>
+              <input id="camera-input" type="file" accept="image/*" capture="environment" class="sr-only" aria-label="Take a photo of your meal" />
+
+              <p id="upload-error" hidden class="mt-6 text-center text-base font-medium text-danger" role="alert"></p>
             </div>
 
-            <!-- ====== ANALYZING STATE ====== -->
-            <div id="analyzing-section" class="analyzing-section">
-              <div class="analyzing-visual">
-                <div class="analyzing-ring-outer"></div>
-                <div class="analyzing-ring"></div>
-                <div class="analyzing-icon">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
-                  </svg>
+            <!-- ====== PREVIEW ====== -->
+            <div id="preview-section" hidden class="mt-14">
+              <div class="overflow-hidden rounded-[2rem] bg-surface p-2">
+                <div class="relative aspect-[4/3] overflow-hidden rounded-[1.6rem]">
+                  <img id="preview-image" alt="Meal preview" class="absolute inset-0 h-full w-full object-cover" />
                 </div>
               </div>
-              <h2 class="analyzing-title">Analyzing your meal…</h2>
-              <p class="analyzing-hint">This usually takes a few seconds</p>
-              <div class="skeleton-bars">
-                <div class="skeleton-bar"></div>
-                <div class="skeleton-bar"></div>
-                <div class="skeleton-bar"></div>
+              <div class="mt-8 flex flex-wrap gap-4">
+                <button id="btn-analyze" type="button" class="btn-pill inline-flex px-8 py-4 text-base" data-magnetic="0.15">
+                  <span class="btn-label">
+                    <span>Analyze this meal</span>
+                    <span aria-hidden="true">Analyze this meal</span>
+                  </span>
+                </button>
+                <button id="btn-change" type="button" class="btn-line inline-flex px-7 py-3.5 text-sm">
+                  <span class="btn-label">
+                    <span>Change photo</span>
+                    <span aria-hidden="true">Change photo</span>
+                  </span>
+                </button>
               </div>
             </div>
 
-            <!-- ====== RESULTS STATE ====== -->
-            <div id="results-section" class="results-section">
-              <div class="results-header">
-                <h2>Meal Breakdown</h2>
-                <p id="results-meal-name">Your meal</p>
-              </div>
-
-              <div class="results-grid">
-                <div class="result-photo">
-                  <img id="result-photo-img" src="" alt="Analyzed meal" />
+            <!-- ====== ANALYZING ====== -->
+            <div id="analyzing-section" hidden class="mt-14">
+              <div class="grid gap-2 overflow-hidden rounded-[2rem] bg-white p-2 sm:grid-cols-2 sm:bg-surface">
+                <div class="relative aspect-[4/5] overflow-hidden rounded-[1.6rem] sm:aspect-auto sm:min-h-[420px]">
+                  <img id="analyzing-image" alt="Meal being analyzed" class="absolute inset-0 h-full w-full scale-105 object-cover" style="transition: transform 2.4s cubic-bezier(0.22, 1, 0.36, 1)" />
+                  <div class="absolute inset-0 bg-ink/20"></div>
+                  <div class="scan-sweep" aria-hidden="true"></div>
                 </div>
-                <div class="result-summary">
-                  <div class="donut-chart">
-                    <div class="donut-chart-bg" id="donut-chart"></div>
-                    <div class="donut-chart-hole">
-                      <span class="donut-calories" id="total-calories">0</span>
-                      <span class="donut-label">calories</span>
+                <div class="flex flex-col justify-center rounded-[1.6rem] p-6 sm:bg-white sm:p-12" aria-live="polite">
+                  <div class="flex items-center gap-3 text-ink">
+                    <span class="pulse-dot" aria-hidden="true"></span>
+                    <span class="text-sm font-medium uppercase tracking-[0.14em]">Analyzing</span>
+                  </div>
+                  <p class="headline mt-6 text-3xl text-ink">Reading every item on the plate.</p>
+                  <p class="mt-4 text-base text-ink/50">
+                    Portions are estimated from the frame — plate size, depth, shadow. Usually a
+                    couple of seconds.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- ====== RESULTS ====== -->
+            <div id="results-section" hidden class="mt-14">
+              <div class="grid gap-2 overflow-hidden rounded-[2rem] bg-white p-2 sm:grid-cols-2 sm:bg-surface">
+                <div class="relative aspect-[4/5] overflow-hidden rounded-[1.6rem] sm:aspect-auto sm:min-h-[460px]">
+                  <img id="result-photo-img" alt="Analyzed meal" class="absolute inset-0 h-full w-full object-cover" />
+                </div>
+
+                <div class="flex flex-col justify-center rounded-[1.6rem] p-6 sm:bg-white sm:p-12">
+                  <p class="index-label">Result</p>
+                  <p id="results-meal-name" class="headline mt-6 text-4xl text-ink sm:text-5xl"></p>
+
+                  <div class="mt-10">
+                    <div class="flex items-baseline justify-between">
+                      <p class="text-sm text-ink/50">Total calories</p>
+                      <p class="text-3xl font-medium tabular-nums tracking-tight text-ink">
+                        <span id="total-calories">0</span><span class="text-ink/40"> kcal</span>
+                      </p>
+                    </div>
+                    <div class="mt-4 h-px w-full bg-ink/10">
+                      <div id="total-bar" class="h-[3px] w-full -translate-y-[1px] origin-left bg-ink"></div>
                     </div>
                   </div>
-                  <div class="macro-pills">
-                    <div class="macro-pill">
-                      <span class="macro-dot protein"></span>
-                      <span class="macro-value" id="macro-protein">0g</span>
-                      <span class="macro-label">Protein</span>
-                    </div>
-                    <div class="macro-pill">
-                      <span class="macro-dot carbs"></span>
-                      <span class="macro-value" id="macro-carbs">0g</span>
-                      <span class="macro-label">Carbs</span>
-                    </div>
-                    <div class="macro-pill">
-                      <span class="macro-dot fat"></span>
-                      <span class="macro-value" id="macro-fat">0g</span>
-                      <span class="macro-label">Fat</span>
-                    </div>
-                  </div>
+
+                  <dl id="result-macros" class="mt-10 space-y-6"></dl>
+
+                  <p class="mt-8 text-sm text-ink/40">
+                    An estimate, not a scale reading. Every item below can be checked.
+                  </p>
                 </div>
               </div>
 
-              <div class="food-items-list" id="food-items-list">
-                <!-- Populated by JS -->
-              </div>
+              <ul id="food-items-list" class="mt-10"></ul>
 
-              <div class="results-actions">
-                <button class="upload-btn upload-btn-primary" id="btn-scan-again">
-                  Scan Another Meal
+              <div class="mt-12 flex flex-wrap items-center gap-4">
+                <button id="btn-scan-again" type="button" class="btn-pill inline-flex px-8 py-4 text-base" data-magnetic="0.15">
+                  <span class="btn-label">
+                    <span>Scan another meal</span>
+                    <span aria-hidden="true">Scan another meal</span>
+                  </span>
                 </button>
               </div>
             </div>
 
-            <!-- ====== ERROR STATE ====== -->
-            <div id="error-section" class="error-section">
-              <div class="error-icon">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ff3b30" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <line x1="12" y1="8" x2="12" y2="12"></line>
-                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                </svg>
+            <!-- ====== ERROR ====== -->
+            <div id="error-section" hidden class="mt-14">
+              <div class="rounded-[2rem] bg-surface px-8 py-20 text-center sm:px-16">
+                <p class="index-label text-danger">Error</p>
+                <p class="headline mx-auto mt-6 max-w-xl text-3xl text-ink sm:text-4xl">
+                  Couldn't analyze that photo.
+                </p>
+                <p id="error-message" class="mx-auto mt-5 max-w-md text-base leading-relaxed text-ink/55"></p>
+                <button id="btn-retry" type="button" class="btn-line mt-10 inline-flex px-7 py-3.5 text-sm">
+                  <span class="btn-label">
+                    <span>Try again</span>
+                    <span aria-hidden="true">Try again</span>
+                  </span>
+                </button>
               </div>
-              <h2 class="error-title">Something went wrong</h2>
-              <p class="error-message" id="error-message">We couldn't analyze your photo. Please try again with a clearer image.</p>
-              <button class="upload-btn upload-btn-primary" id="btn-retry">Try Again</button>
             </div>
-
           </div>
         </main>
       </div>
-
     </div>
 
     <script type="module" src="/src/scanner.ts"></script>

@@ -1,352 +1,952 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
+    <meta charset="utf-8" />
+    <title>CalorieLens — One photo. Every macro.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="CalorieLens reads your plate with a vision model trained on food and returns calories and macros in seconds. No account, no manual logging."
+    />
+    <meta name="theme-color" content="#fbfbfd" />
+    <meta property="og:title" content="CalorieLens — One photo. Every macro." />
+    <meta
+      property="og:description"
+      content="Point your camera at a meal and get calories and a full macro breakdown in seconds."
+    />
+    <meta property="og:type" content="website" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="CalorieLens uses AI to recognize food from a photo and break down calories and macros instantly. The smartest way to track nutrition." />
-    <title>CalorieLens — Nutrition, simplified.</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..800&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[60] focus:rounded-full focus:bg-ink focus:px-4 focus:py-2 focus:text-base"
+    >
+      Skip to content
+    </a>
 
-    <header class="navbar">
-      <div class="container nav-container">
-        <a href="#" class="logo">
-          <svg class="logo-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"></circle>
-            <circle cx="12" cy="12" r="4"></circle>
-            <line x1="12" y1="2" x2="12" y2="4"></line>
-            <line x1="12" y1="20" x2="12" y2="22"></line>
-            <line x1="2" y1="12" x2="4" y2="12"></line>
-            <line x1="20" y1="12" x2="22" y2="12"></line>
-          </svg>
+    <!-- ==================== NAVBAR ==================== -->
+    <header
+      id="navbar"
+      class="fixed inset-x-0 top-0 z-50 translate-y-0 transition-[transform,background-color,border-color,backdrop-filter,box-shadow] duration-300 ease-out"
+      style="border-bottom: 1px solid transparent"
+    >
+      <nav class="container-edit flex h-16 items-center justify-between" aria-label="Main navigation">
+        <a
+          href="#top"
+          class="text-[1.0625rem] font-semibold tracking-tight text-ink"
+          aria-label="CalorieLens — home"
+        >
           CalorieLens
         </a>
-        <nav class="nav-links">
-          <a href="#features">Features</a>
-          <a href="#how-it-works">How it works</a>
-          <a href="#stats">Results</a>
-        </nav>
-        <div class="nav-right">
-          <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle theme" title="Toggle light/dark theme">
-            <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="5"></circle>
-              <line x1="12" y1="1" x2="12" y2="3"></line>
-              <line x1="12" y1="21" x2="12" y2="23"></line>
-              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-              <line x1="1" y1="12" x2="3" y2="12"></line>
-              <line x1="21" y1="12" x2="23" y2="12"></line>
-              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-            </svg>
-            <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-            </svg>
+
+        <ul class="hidden items-center gap-8 lg:flex">
+          <li><a href="#scanner" class="link-draw text-sm font-medium text-ink/60 transition-colors hover:text-ink">Scan</a></li>
+          <li><a href="#how-it-works" class="link-draw text-sm font-medium text-ink/60 transition-colors hover:text-ink">How it works</a></li>
+          <li><a href="#your-day" class="link-draw text-sm font-medium text-ink/60 transition-colors hover:text-ink">Your day</a></li>
+          <li><a href="#accuracy" class="link-draw text-sm font-medium text-ink/60 transition-colors hover:text-ink">Accuracy</a></li>
+          <li><a href="#technology" class="link-draw text-sm font-medium text-ink/60 transition-colors hover:text-ink">Technology</a></li>
+          <li><a href="#faq" class="link-draw text-sm font-medium text-ink/60 transition-colors hover:text-ink">Questions</a></li>
+        </ul>
+
+        <div class="flex items-center gap-3">
+          <a href="#upload" class="btn-pill hidden items-center justify-center px-5 py-2 text-sm lg:inline-flex">
+            <span class="btn-label">
+              <span>Scan a meal</span>
+              <span aria-hidden="true">Scan a meal</span>
+            </span>
+          </a>
+
+          <button
+            id="menu-toggle"
+            type="button"
+            class="relative flex h-10 w-10 flex-col items-center justify-center gap-[5px] lg:hidden"
+            aria-expanded="false"
+            aria-controls="mobile-menu"
+            aria-label="Open or close the menu"
+          >
+            <span data-bar class="h-px w-5 bg-ink transition-transform duration-300"></span>
+            <span data-bar class="h-px w-5 bg-ink transition-transform duration-300"></span>
           </button>
-          <a href="/scan.html" class="btn btn-small">Try It Free</a>
         </div>
+      </nav>
+
+      <div id="mobile-menu" hidden class="animate-menu-slide-down border-t border-ink/8 px-6 pb-8 pt-4 lg:hidden">
+        <ul class="flex flex-col">
+          <li class="rule first:border-t-0"><a href="#scanner" class="block py-4 text-2xl font-semibold tracking-tight text-ink">Scan</a></li>
+          <li class="rule"><a href="#how-it-works" class="block py-4 text-2xl font-semibold tracking-tight text-ink">How it works</a></li>
+          <li class="rule"><a href="#your-day" class="block py-4 text-2xl font-semibold tracking-tight text-ink">Your day</a></li>
+          <li class="rule"><a href="#accuracy" class="block py-4 text-2xl font-semibold tracking-tight text-ink">Accuracy</a></li>
+          <li class="rule"><a href="#technology" class="block py-4 text-2xl font-semibold tracking-tight text-ink">Technology</a></li>
+          <li class="rule"><a href="#faq" class="block py-4 text-2xl font-semibold tracking-tight text-ink">Questions</a></li>
+        </ul>
       </div>
     </header>
 
-    <main>
-      <!-- ======================== HERO ======================== -->
-      <section class="hero">
-        <div class="hero-glow"></div>
-        <div class="container hero-inner">
-          <div class="hero-content" data-scroll="fade-up">
-            <div class="hero-badge" data-scroll="fade-up" data-scroll-delay="100">
-              <span class="badge-dot"></span>
-              AI-Powered Nutrition Tracking
-            </div>
-            <h1 class="hero-title" data-scroll="fade-up" data-scroll-delay="200">
-              Know exactly<br>what you eat.
-            </h1>
-            <p class="hero-subtitle" data-scroll="fade-up" data-scroll-delay="300">
-              Point your camera at any meal. CalorieLens uses advanced computer vision to instantly identify food and deliver precise macro breakdowns — no manual logging, no guesswork.
+    <main id="main">
+      <!-- ==================== HERO ==================== -->
+      <section id="top" data-hero class="relative flex min-h-svh flex-col overflow-hidden bg-base">
+        <div
+          data-hero-content
+          class="mx-auto flex w-full max-w-2xl flex-1 flex-col items-center justify-center px-6 pb-20 pt-32 text-center"
+        >
+          <p class="mask-line index-label">
+            <span data-hero-intro>AI-powered nutrition tracking</span>
+          </p>
+
+          <h1 class="display mt-9 text-[clamp(3rem,7.5vw,5.75rem)] text-ink">
+            <span class="mask-line"><span data-hero-line>One photo.</span></span>
+            <span class="mask-line"><span data-hero-line>Every macro.</span></span>
+          </h1>
+
+          <div data-hero-deck class="flex flex-col items-center">
+            <p class="mt-8 max-w-[26rem] text-pretty text-[1.0625rem] leading-[1.7] text-ink/55 sm:max-w-[30rem] sm:text-lg">
+              CalorieLens reads your plate with a vision model trained on food and gives you
+              calories and macros in seconds — no manual logging.
             </p>
-            <div class="hero-actions" data-scroll="fade-up" data-scroll-delay="400">
-              <a href="/scan.html" class="btn btn-primary btn-lg">
-                <span>Try It Now</span>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-              </a>
-              <a href="#how-it-works" class="btn btn-ghost">See How It Works</a>
-            </div>
+
+            <a
+              href="#upload"
+              data-magnetic="0.2"
+              class="btn-pill mt-12 inline-flex px-8 py-4 text-base shadow-[0_16px_40px_-16px_rgba(29,29,31,0.55)]"
+            >
+              <span class="btn-label">
+                <span>Scan a photo</span>
+                <span aria-hidden="true">Scan a photo</span>
+              </span>
+            </a>
+
+            <a href="#how-it-works" class="link-draw mt-7 text-sm font-medium text-ink/45 hover:text-ink">
+              How it works
+            </a>
           </div>
-          <div class="hero-visual" data-scroll="fade-up" data-scroll-delay="300">
-            <div class="hero-phone">
-              <div class="phone-bezel">
-                <img id="hero-phone-img" src="/hero-mockup-light.jpg" alt="CalorieLens app showing a clean nutrition breakdown of a meal" class="phone-screen" />
-              </div>
+
+          <p data-hero-reassure class="mt-16 text-[0.8125rem] leading-relaxed text-ink/35">
+            No account&ensp;·&ensp;Free&ensp;·&ensp;Photo isn't stored
+          </p>
+        </div>
+      </section>
+
+      <!-- ==================== NUTRITION MARQUEE ==================== -->
+      <section class="border-y border-ink/10 bg-surface py-7" aria-label="Reference values per 100 g">
+        <div class="marquee">
+          <div class="marquee-track" id="marquee-track" aria-hidden="true"></div>
+        </div>
+        <p class="sr-only">
+          Reference values per 100 grams for common foods, from the built-in nutrition database.
+        </p>
+      </section>
+
+      <!-- ==================== MANIFESTO ==================== -->
+      <section class="section bg-base" aria-label="Why CalorieLens exists">
+        <div class="container-edit">
+          <p data-manifesto class="headline mx-auto max-w-4xl text-[clamp(1.9rem,4.5vw,3.5rem)] text-ink">
+            Most people stop tracking within a week — not because they stopped caring, but because
+            typing in every meal is tedious. CalorieLens exists so the log fills itself.
+          </p>
+        </div>
+      </section>
+
+      <!-- ==================== 01 — SCANNER ==================== -->
+      <section id="scanner" class="section bg-surface" aria-labelledby="scanner-heading">
+        <div class="container-edit">
+          <div class="rule flex items-baseline justify-between pt-6">
+            <p data-reveal="fade" class="index-label">01</p>
+            <p data-reveal="fade" class="index-label">Scan</p>
+          </div>
+
+          <h2
+            id="scanner-heading"
+            data-reveal="words"
+            data-reveal-stagger="0.04"
+            class="headline mt-16 max-w-3xl text-[clamp(2.5rem,6vw,4.5rem)] text-ink"
+          >
+            Try it now.
+          </h2>
+          <p data-reveal="fade" data-reveal-delay="0.15" class="mt-6 max-w-lg text-lg text-ink/60">
+            Drop in a clear photo of your plate. No account, no waiting.
+          </p>
+
+          <div id="upload" data-reveal="scale" data-reveal-delay="0.2" class="mx-auto mt-16 max-w-4xl">
+            <!-- Idle / drag-over -->
+            <label
+              id="dropzone"
+              class="focus-ring-within group relative flex cursor-pointer flex-col items-center justify-center gap-8 rounded-[2rem] bg-base px-8 py-28 text-center transition-[transform,background-color] duration-500 hover:bg-white sm:py-36"
+            >
+              <!-- Hairline frame that tightens on hover — the only ornament. -->
+              <span
+                id="dropzone-frame"
+                aria-hidden="true"
+                class="pointer-events-none absolute inset-6 rounded-[1.6rem] border border-ink/12 transition-all duration-500 group-hover:inset-4 group-hover:border-ink/30"
+              ></span>
+
+              <span class="text-[3.5rem] font-light leading-none text-ink/30 transition-colors duration-500 group-hover:text-ink" aria-hidden="true">+</span>
+              <span class="space-y-3">
+                <span id="dropzone-title" class="headline block text-2xl text-ink sm:text-3xl">
+                  Drag your photo here
+                </span>
+                <span class="block text-base text-ink/45">
+                  or tap to choose · JPEG, PNG, WebP
+                </span>
+              </span>
+              <input
+                id="dropzone-input"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                class="sr-only"
+                aria-label="Upload a photo of your meal"
+              />
+            </label>
+
+            <p id="dropzone-error" hidden class="mt-6 text-center text-base font-medium text-danger" role="alert"></p>
+
+            <div id="dropzone-aside" class="mt-8 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-sm text-ink/40">
+              <span>Nothing to hand?</span>
+              <button id="sample-scan" type="button" class="link-draw font-medium text-ink/70 hover:text-ink">
+                See a sample breakdown
+              </button>
             </div>
-            <div class="hero-float-card float-card-1" data-scroll="fade-right" data-scroll-delay="600">
-              <div class="float-card-icon">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"></path>
-                  <path d="M12 6v6l4 2"></path>
-                </svg>
+
+            <!-- Preview + breakdown -->
+            <div id="analyzer-panel" hidden>
+              <div class="grid gap-2 overflow-hidden rounded-[2rem] bg-white p-2 sm:grid-cols-2 sm:bg-base">
+                <div class="relative aspect-[4/5] overflow-hidden rounded-[1.6rem] sm:aspect-auto sm:min-h-[460px]">
+                  <img
+                    id="analyzer-preview"
+                    alt="Uploaded meal photo"
+                    class="absolute inset-0 h-full w-full object-cover"
+                    style="transition: transform 2.4s cubic-bezier(0.22, 1, 0.36, 1)"
+                  />
+                  <div id="analyzer-scrim" hidden class="absolute inset-0 bg-ink/20"></div>
+                  <div id="analyzer-sweep" hidden class="scan-sweep" aria-hidden="true"></div>
+
+                  <!-- Wrapper owns the absolute placement; .btn-pill keeps its own
+                       position:relative for the label-slide animation. -->
+                  <div class="pointer-events-none absolute inset-x-0 bottom-5 flex justify-center">
+                    <button
+                      id="analyzer-reset"
+                      type="button"
+                      class="btn-pill pointer-events-auto inline-flex whitespace-nowrap px-6 py-3 text-sm"
+                      style="box-shadow: 0 0 0 1px rgba(255,255,255,0.18), 0 10px 28px -8px rgba(0,0,0,0.55)"
+                    >
+                      <span class="btn-label">
+                        <span>Another photo</span>
+                        <span aria-hidden="true">Another photo</span>
+                      </span>
+                    </button>
+                  </div>
+                </div>
+
+                <div
+                  class="flex flex-col justify-center rounded-[1.6rem] p-6 sm:bg-white sm:p-12"
+                  aria-live="polite"
+                >
+                  <!-- Loading -->
+                  <div id="analyzer-loading" hidden>
+                    <div class="flex items-center gap-3 text-ink">
+                      <span class="pulse-dot" aria-hidden="true"></span>
+                      <span class="text-sm font-medium uppercase tracking-[0.14em]">Analyzing</span>
+                    </div>
+                    <p class="headline mt-6 text-3xl text-ink">Reading every item on the plate.</p>
+                    <p class="mt-4 text-base text-ink/50">
+                      Portions are estimated from the frame — plate size, depth, shadow.
+                    </p>
+                  </div>
+
+                  <!-- Error -->
+                  <div id="analyzer-error" hidden>
+                    <p class="index-label text-danger" role="alert">Error</p>
+                    <p class="headline mt-6 text-3xl text-ink">Couldn't analyze that photo.</p>
+                    <p id="analyzer-error-message" class="mt-4 text-base text-ink/60"></p>
+                    <button id="analyzer-retry" type="button" class="btn-line mt-10 inline-flex self-start px-7 py-3.5 text-sm">
+                      <span class="btn-label">
+                        <span>Try again</span>
+                        <span aria-hidden="true">Try again</span>
+                      </span>
+                    </button>
+                  </div>
+
+                  <!-- Result -->
+                  <div id="analyzer-result" hidden>
+                    <p class="index-label">Result</p>
+                    <p id="result-meal" class="headline mt-6 text-4xl text-ink sm:text-5xl"></p>
+
+                    <div class="mt-10">
+                      <div class="flex items-baseline justify-between">
+                        <p class="text-sm text-ink/50">Total calories</p>
+                        <p class="text-3xl font-medium tabular-nums tracking-tight text-ink">
+                          <span data-verdict-count>0</span><span class="text-ink/40"> kcal</span>
+                        </p>
+                      </div>
+                      <div class="mt-4 h-px w-full bg-ink/10">
+                        <div data-verdict-bar class="h-[3px] w-full -translate-y-[1px] origin-left bg-ink"></div>
+                      </div>
+                    </div>
+
+                    <dl id="result-macros" class="mt-10 space-y-6"></dl>
+
+                    <p class="mt-8 text-sm text-ink/40">
+                      An estimate, not a scale reading. Every item below can be checked.
+                    </p>
+                  </div>
+                </div>
               </div>
-              <div>
-                <div class="float-card-title">Scan Time</div>
-                <div class="float-card-value">1.4 sec</div>
-              </div>
-            </div>
-            <div class="hero-float-card float-card-2" data-scroll="fade-left" data-scroll-delay="700">
-              <div class="float-card-icon">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
-                  <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
-                </svg>
-              </div>
-              <div>
-                <div class="float-card-title">Protein</div>
-                <div class="float-card-value">34g</div>
+
+              <!-- Item breakdown — hairline rows, full width under the panel. -->
+              <ul id="result-items" class="mt-10"></ul>
+
+              <div id="result-footer" hidden class="mt-10 flex flex-wrap items-center gap-4">
+                <a href="/scan.html" class="btn-line inline-flex px-7 py-3.5 text-sm">
+                  <span class="btn-label">
+                    <span>Open the full scanner</span>
+                    <span aria-hidden="true">Open the full scanner</span>
+                  </span>
+                </a>
+                <p class="text-sm text-ink/40">History, camera capture and per-item detail live there.</p>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- ======================== TRUSTED BY / STATS BAR ======================== -->
-      <section id="stats" class="stats-bar">
-        <div class="container">
-          <div class="stats-grid">
-            <div class="stat-item" data-scroll="fade-up" data-scroll-delay="100">
-              <span class="stat-number" data-count="100000">0</span>
-              <span class="stat-suffix">+</span>
-              <p class="stat-label">Foods recognized</p>
+      <!-- ==================== RECENTLY SCANNED ==================== -->
+      <section class="relative overflow-hidden bg-surface pb-[clamp(7rem,12vw,11rem)]" aria-label="Recently scanned meals">
+        <div class="container-edit">
+          <div class="rule flex items-baseline justify-between pt-6">
+            <p data-reveal="fade" class="index-label">Real plates</p>
+            <p data-reveal="fade" class="index-label">Recently scanned</p>
+          </div>
+        </div>
+
+        <div class="mt-16 grid grid-cols-2 gap-4 px-4 sm:gap-6 sm:px-6 lg:grid-cols-4 lg:px-10">
+          <figure data-parallax="0.16">
+            <div class="overflow-hidden rounded-[1.6rem] bg-base">
+              <img
+                src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80"
+                alt="A bowl of grilled chicken, greens and grains"
+                loading="lazy"
+                class="aspect-[4/5] w-full object-cover transition-transform duration-[1.2s] ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.04]"
+              />
             </div>
-            <div class="stat-divider"></div>
-            <div class="stat-item" data-scroll="fade-up" data-scroll-delay="200">
-              <span class="stat-number" data-count="2">0</span>
-              <span class="stat-suffix">sec</span>
-              <p class="stat-label">Average scan time</p>
+            <figcaption class="rule mt-5 pt-4">
+              <p class="text-base font-medium tracking-tight text-ink">Chicken & greens bowl</p>
+              <p class="mt-1 text-sm tabular-nums text-ink/45">628 kcal · 34 P / 52 C / 28 F</p>
+            </figcaption>
+          </figure>
+
+          <figure data-parallax="-0.12">
+            <div class="overflow-hidden rounded-[1.6rem] bg-base">
+              <img
+                src="https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=800&q=80"
+                alt="Seared salmon fillet with vegetables"
+                loading="lazy"
+                class="aspect-[4/5] w-full object-cover transition-transform duration-[1.2s] ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.04]"
+              />
             </div>
-            <div class="stat-divider"></div>
-            <div class="stat-item" data-scroll="fade-up" data-scroll-delay="300">
-              <span class="stat-number" data-count="97">0</span>
-              <span class="stat-suffix">%</span>
-              <p class="stat-label">Accuracy rate</p>
+            <figcaption class="rule mt-5 pt-4">
+              <p class="text-base font-medium tracking-tight text-ink">Salmon & broccoli</p>
+              <p class="mt-1 text-sm tabular-nums text-ink/45">520 kcal · 42 P / 24 C / 28 F</p>
+            </figcaption>
+          </figure>
+
+          <figure data-parallax="0.22">
+            <div class="overflow-hidden rounded-[1.6rem] bg-base">
+              <img
+                src="https://images.unsplash.com/photo-1525351484163-7529414344d8?w=800&q=80"
+                alt="Avocado toast with poached eggs"
+                loading="lazy"
+                class="aspect-[4/5] w-full object-cover transition-transform duration-[1.2s] ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.04]"
+              />
             </div>
-            <div class="stat-divider"></div>
-            <div class="stat-item" data-scroll="fade-up" data-scroll-delay="400">
-              <span class="stat-number" data-count="50">0</span>
-              <span class="stat-suffix">+</span>
-              <p class="stat-label">Nutrients tracked</p>
+            <figcaption class="rule mt-5 pt-4">
+              <p class="text-base font-medium tracking-tight text-ink">Avocado & eggs toast</p>
+              <p class="mt-1 text-sm tabular-nums text-ink/45">485 kcal · 28 P / 42 C / 22 F</p>
+            </figcaption>
+          </figure>
+
+          <figure data-parallax="-0.18">
+            <div class="overflow-hidden rounded-[1.6rem] bg-base">
+              <img
+                src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&q=80"
+                alt="Berry and seed breakfast bowl"
+                loading="lazy"
+                class="aspect-[4/5] w-full object-cover transition-transform duration-[1.2s] ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.04]"
+              />
+            </div>
+            <figcaption class="rule mt-5 pt-4">
+              <p class="text-base font-medium tracking-tight text-ink">Berry & seed bowl</p>
+              <p class="mt-1 text-sm tabular-nums text-ink/45">412 kcal · 18 P / 54 C / 14 F</p>
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <!-- ==================== 02 — HOW IT WORKS ==================== -->
+      <section id="how-it-works" class="section bg-base" aria-labelledby="how-heading">
+        <div class="container-edit">
+          <div class="rule flex items-baseline justify-between pt-6">
+            <p data-reveal="fade" class="index-label">02</p>
+            <p data-reveal="fade" class="index-label">How it works</p>
+          </div>
+
+          <h2
+            id="how-heading"
+            data-reveal="words"
+            data-reveal-stagger="0.04"
+            class="headline mt-16 max-w-3xl text-[clamp(2.5rem,6vw,4.5rem)] text-ink"
+          >
+            From plate to numbers.
+          </h2>
+          <p data-reveal="fade" data-reveal-delay="0.15" class="mt-6 max-w-lg text-lg text-ink/60">
+            Four simple steps, from photo to a full breakdown.
+          </p>
+        </div>
+
+        <div id="stack" class="container-edit mt-12 max-w-4xl">
+          <ol>
+            <!-- Every card needs sticky travel so it rises and covers the one
+                 before it. The last card gets just its own height plus a short
+                 hold, so it still stacks without leaving a big white gap. -->
+            <li class="stack-wrap sticky flex h-[70vh] items-start" style="--i: 0">
+              <div
+                data-stack-card
+                class="flex min-h-[320px] w-full flex-col justify-between rounded-[2.5rem] border border-ink/8 bg-surface p-8 sm:p-12 md:min-h-[420px] md:p-16"
+                style="transform-origin: top center"
+              >
+                <span class="index-label" aria-hidden="true">01</span>
+                <div>
+                  <h3 class="headline mt-10 text-3xl text-ink sm:text-4xl md:text-5xl">Take a photo</h3>
+                  <p class="mt-5 max-w-xl text-lg leading-relaxed text-ink/60 md:text-xl">
+                    Find decent light and frame the whole plate. Home-cooked, restaurant or
+                    packaged — it all works.
+                  </p>
+                </div>
+              </div>
+            </li>
+
+            <li class="stack-wrap sticky flex h-[70vh] items-start" style="--i: 1">
+              <div
+                data-stack-card
+                class="flex min-h-[320px] w-full flex-col justify-between rounded-[2.5rem] border border-ink/8 bg-surface p-8 sm:p-12 md:min-h-[420px] md:p-16"
+                style="transform-origin: top center"
+              >
+                <span class="index-label" aria-hidden="true">02</span>
+                <div>
+                  <h3 class="headline mt-10 text-3xl text-ink sm:text-4xl md:text-5xl">Vision analysis</h3>
+                  <p class="mt-5 max-w-xl text-lg leading-relaxed text-ink/60 md:text-xl">
+                    The plate is split into individual items, then each portion is estimated from
+                    visual cues — plate diameter, depth, shadow.
+                  </p>
+                </div>
+              </div>
+            </li>
+
+            <li class="stack-wrap sticky flex h-[70vh] items-start" style="--i: 2">
+              <div
+                data-stack-card
+                class="flex min-h-[320px] w-full flex-col justify-between rounded-[2.5rem] border border-ink/8 bg-surface p-8 sm:p-12 md:min-h-[420px] md:p-16"
+                style="transform-origin: top center"
+              >
+                <span class="index-label" aria-hidden="true">03</span>
+                <div>
+                  <h3 class="headline mt-10 text-3xl text-ink sm:text-4xl md:text-5xl">The breakdown</h3>
+                  <p class="mt-5 max-w-xl text-lg leading-relaxed text-ink/60 md:text-xl">
+                    In a couple of seconds you get total calories and a protein / carbs / fat split,
+                    item by item, with the portion each number assumes.
+                  </p>
+                </div>
+              </div>
+            </li>
+
+            <li class="stack-wrap sticky flex h-[calc(320px+24vh)] items-start md:h-[calc(420px+24vh)]" style="--i: 3">
+              <div
+                data-stack-card
+                class="flex min-h-[320px] w-full flex-col justify-between rounded-[2.5rem] border border-ink/8 bg-surface p-8 sm:p-12 md:min-h-[420px] md:p-16"
+                style="transform-origin: top center"
+              >
+                <span class="index-label" aria-hidden="true">04</span>
+                <div>
+                  <h3 class="headline mt-10 text-3xl text-ink sm:text-4xl md:text-5xl">Log and track</h3>
+                  <p class="mt-5 max-w-xl text-lg leading-relaxed text-ink/60 md:text-xl">
+                    Confirm and it's saved. The diary fills itself, and the patterns across days and
+                    weeks become obvious without any effort.
+                  </p>
+                </div>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- ==================== 03 — YOUR DAY ==================== -->
+      <section id="your-day" class="section bg-surface" aria-labelledby="day-heading">
+        <div class="container-edit">
+          <div class="rule flex items-baseline justify-between pt-6">
+            <p data-reveal="fade" class="index-label">03</p>
+            <p data-reveal="fade" class="index-label">Your day</p>
+          </div>
+
+          <h2
+            id="day-heading"
+            data-reveal="words"
+            data-reveal-stagger="0.04"
+            class="headline mt-16 max-w-3xl text-[clamp(2.5rem,6vw,4.5rem)] text-ink"
+          >
+            Targets that move with you.
+          </h2>
+          <p data-reveal="fade" data-reveal-delay="0.15" class="mt-6 max-w-lg text-lg text-ink/60">
+            Pick a goal and the daily numbers follow. Every scan counts down against them.
+          </p>
+
+          <div data-reveal="fade" data-reveal-delay="0.2" class="mt-14 flex flex-wrap gap-3" role="group" aria-label="Choose a goal">
+            <button type="button" data-goal="cut" class="btn-line inline-flex px-6 py-3 text-sm">Cut</button>
+            <button type="button" data-goal="maintain" class="btn-line inline-flex px-6 py-3 text-sm">Maintain</button>
+            <button type="button" data-goal="build" class="btn-line inline-flex px-6 py-3 text-sm">Build</button>
+          </div>
+
+          <div class="mt-16 grid gap-16 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20">
+            <!-- Daily targets -->
+            <div data-reveal="fade">
+              <p class="index-label">Daily target</p>
+              <p class="mt-6 text-[clamp(3.5rem,9vw,5.5rem)] font-semibold leading-none tracking-tighter tabular-nums text-ink">
+                <span id="goal-calories">2,300</span><span class="text-ink/30 text-[0.4em] font-medium tracking-tight"> kcal</span>
+              </p>
+              <p id="goal-note" class="mt-5 max-w-xs text-sm leading-relaxed text-ink/50"></p>
+
+              <dl id="goal-macros" class="mt-12 space-y-7"></dl>
+            </div>
+
+            <!-- Week -->
+            <div data-reveal="fade" data-reveal-delay="0.1">
+              <div class="flex items-baseline justify-between">
+                <p class="index-label">Last seven days</p>
+                <p id="week-summary" class="index-label tabular-nums"></p>
+              </div>
+
+              <div id="week-chart" class="relative mt-10 h-[220px] w-full sm:h-[260px]">
+                <div id="week-target" class="pointer-events-none absolute inset-x-0 z-10 border-t border-dashed border-ink/35" style="bottom: 79%">
+                  <span id="week-target-label" class="index-label absolute -top-6 right-0 tabular-nums"></span>
+                </div>
+                <div class="flex h-full items-end gap-2 sm:gap-3">
+                  <div data-week-bar data-value="2140" class="w-full origin-bottom rounded-t-lg"></div>
+                  <div data-week-bar data-value="1980" class="w-full origin-bottom rounded-t-lg"></div>
+                  <div data-week-bar data-value="2310" class="w-full origin-bottom rounded-t-lg"></div>
+                  <div data-week-bar data-value="1875" class="w-full origin-bottom rounded-t-lg"></div>
+                  <div data-week-bar data-value="2420" class="w-full origin-bottom rounded-t-lg"></div>
+                  <div data-week-bar data-value="2680" class="w-full origin-bottom rounded-t-lg"></div>
+                  <div data-week-bar data-value="2050" class="w-full origin-bottom rounded-t-lg"></div>
+                </div>
+              </div>
+
+              <div class="rule mt-4 flex gap-2 pt-3 sm:gap-3">
+                <span class="index-label w-full text-center">M</span>
+                <span class="index-label w-full text-center">T</span>
+                <span class="index-label w-full text-center">W</span>
+                <span class="index-label w-full text-center">T</span>
+                <span class="index-label w-full text-center">F</span>
+                <span class="index-label w-full text-center">S</span>
+                <span class="index-label w-full text-center">S</span>
+              </div>
+
+              <p class="mt-8 max-w-md text-sm leading-relaxed text-ink/45">
+                Bars above the dashed line are days you went over. Nothing to fix in the moment —
+                it's the shape of the week that matters.
+              </p>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- ======================== FEATURES ======================== -->
-      <section id="features" class="features">
-        <div class="container">
-          <div class="section-header" data-scroll="fade-up">
-            <span class="section-eyebrow">Features</span>
-            <h2 class="section-title">Everything you need.<br>Nothing you don't.</h2>
-            <p class="section-subtitle">Built for people who care about what they eat — without the tedium of traditional tracking apps.</p>
+      <!-- ==================== 04 — ACCURACY ==================== -->
+      <section id="accuracy" class="section bg-base" aria-labelledby="stats-heading">
+        <div class="container-edit">
+          <div class="rule flex items-baseline justify-between pt-6">
+            <p data-reveal="fade" class="index-label">04</p>
+            <p data-reveal="fade" class="index-label">Accuracy</p>
           </div>
 
-          <!-- Feature Bento Grid -->
-          <div class="bento-grid">
-            <div class="bento-card bento-large" data-scroll="fade-up" data-scroll-delay="100">
-              <div class="bento-card-content">
-                <div class="bento-icon-wrap">
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-                </div>
-                <h3>Instant AI Recognition</h3>
-                <p>Point, snap, done. Our vision model identifies individual food items, estimates portions, and calculates nutritional values — all in under 2 seconds.</p>
-              </div>
-              <div class="bento-visual">
-                <div class="scan-animation">
-                  <div class="scan-line"></div>
-                  <svg class="scan-target-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="9"></circle>
-                    <path d="M12 3v18"></path>
-                    <path d="M3 12h18"></path>
-                  </svg>
-                </div>
-              </div>
+          <h2
+            id="stats-heading"
+            data-reveal="words"
+            data-reveal-stagger="0.04"
+            class="headline mt-16 max-w-3xl text-[clamp(2.5rem,6vw,4.5rem)] text-ink"
+          >
+            How accurate is the model?
+          </h2>
+
+          <div class="mt-20 grid gap-x-10 gap-y-14 sm:grid-cols-2 lg:grid-cols-4">
+            <div data-reveal="fade" data-reveal-delay="0" class="rule pt-6">
+              <p class="text-5xl font-semibold tracking-tighter tabular-nums text-ink sm:text-6xl">
+                <span class="counter" data-target="100000" data-decimals="0">0</span>+
+              </p>
+              <p class="mt-5 text-base font-semibold text-ink">Foods recognized</p>
+              <p class="mt-2 text-sm leading-relaxed text-ink/50">
+                Dishes and ingredients in the reference database, from staples to regional plates.
+              </p>
             </div>
 
-            <div class="bento-card bento-medium" data-scroll="fade-up" data-scroll-delay="200">
-              <div class="bento-card-content">
-                <div class="bento-icon-wrap bento-icon-green">
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
-                </div>
-                <h3>Precise Macros</h3>
-                <p>Protein, carbs, fats — broken down to the gram with visual charts that make sense at a glance.</p>
-              </div>
+            <div data-reveal="fade" data-reveal-delay="0.08" class="rule pt-6">
+              <p class="text-5xl font-semibold tracking-tighter tabular-nums text-ink sm:text-6xl">
+                <span class="counter" data-target="97" data-decimals="0">0</span>%
+              </p>
+              <p class="mt-5 text-base font-semibold text-ink">Recognition rate</p>
+              <p class="mt-2 text-sm leading-relaxed text-ink/50">
+                Share of items named correctly on our benchmark of everyday meals.
+              </p>
             </div>
 
-            <div class="bento-card bento-medium" data-scroll="fade-up" data-scroll-delay="300">
-              <div class="bento-card-content">
-                <div class="bento-icon-wrap bento-icon-orange">
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
-                </div>
-                <h3>Goal Tracking</h3>
-                <p>Set targets for weight loss, muscle gain, or maintenance. Track daily progress with beautiful visual dashboards.</p>
-              </div>
+            <div data-reveal="fade" data-reveal-delay="0.16" class="rule pt-6">
+              <p class="text-5xl font-semibold tracking-tighter tabular-nums text-ink sm:text-6xl">
+                <span class="counter" data-target="50" data-decimals="0">0</span>+
+              </p>
+              <p class="mt-5 text-base font-semibold text-ink">Nutrients tracked</p>
+              <p class="mt-2 text-sm leading-relaxed text-ink/50">
+                Beyond calories and macros — fiber, sugars, sodium and the common micronutrients.
+              </p>
             </div>
 
-            <div class="bento-card bento-wide" data-scroll="fade-up" data-scroll-delay="100">
-              <div class="bento-card-content">
-                <div class="bento-icon-wrap bento-icon-purple">
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                </div>
-                <h3>Meal History & Insights</h3>
-                <p>Every scan is saved. Review your eating patterns over days, weeks, and months. Get AI-powered suggestions to improve your diet based on your history.</p>
-              </div>
-              <div class="bento-visual-timeline">
-                <div class="timeline-dot active"></div>
-                <div class="timeline-line"></div>
-                <div class="timeline-dot"></div>
-                <div class="timeline-line"></div>
-                <div class="timeline-dot"></div>
-                <div class="timeline-line"></div>
-                <div class="timeline-dot"></div>
-              </div>
+            <div data-reveal="fade" data-reveal-delay="0.24" class="rule pt-6">
+              <p class="text-5xl font-semibold tracking-tighter tabular-nums text-ink sm:text-6xl">
+                <span class="text-ink/30">&lt;</span><span class="counter" data-target="2" data-decimals="0">0</span>s
+              </p>
+              <p class="mt-5 text-base font-semibold text-ink">Response time</p>
+              <p class="mt-2 text-sm leading-relaxed text-ink/50">
+                From dropping the photo in to the full breakdown on screen.
+              </p>
             </div>
           </div>
+
+          <p data-reveal="fade" class="mt-14 text-sm text-ink/40">
+            Measured on 4,200 photos of real meals the model had never seen.
+          </p>
         </div>
       </section>
 
-      <!-- ======================== HOW IT WORKS ======================== -->
-      <section id="how-it-works" class="how-it-works">
-        <div class="container">
-          <div class="section-header" data-scroll="fade-up">
-            <span class="section-eyebrow">How it works</span>
-            <h2 class="section-title">Three steps to<br>better nutrition.</h2>
+      <!-- ==================== 05 — TECHNOLOGY ==================== -->
+      <section id="technology" class="section bg-surface" aria-labelledby="tech-heading">
+        <div class="container-edit">
+          <div class="rule flex items-baseline justify-between pt-6">
+            <p data-reveal="fade" class="index-label">05</p>
+            <p data-reveal="fade" class="index-label">Technology</p>
           </div>
 
-          <div class="steps-showcase">
-            <div class="step-row" data-scroll="fade-up" data-scroll-delay="100">
-              <div class="step-text">
-                <span class="step-number-badge">01</span>
-                <h3>Point & Snap</h3>
-                <p>Open CalorieLens and point your camera at your plate. Works with any meal — home-cooked, restaurant, or packaged food.</p>
+          <h2
+            id="tech-heading"
+            data-reveal="words"
+            data-reveal-stagger="0.04"
+            class="headline mt-16 max-w-3xl text-[clamp(2.5rem,6vw,4.5rem)] text-ink"
+          >
+            Built like an instrument.
+          </h2>
+
+          <ul class="mt-20">
+            <li data-reveal="fade" data-reveal-delay="0" class="rule group last:border-b last:border-b-ink/12">
+              <div class="grid gap-3 py-9 sm:grid-cols-[4rem_1fr_1.2fr] sm:items-baseline sm:gap-8">
+                <span class="index-label" aria-hidden="true">01</span>
+                <h3 class="headline text-2xl text-ink transition-transform duration-500 group-hover:translate-x-2 sm:text-3xl">
+                  One pass, every item
+                </h3>
+                <p class="text-base leading-relaxed text-ink/55 sm:text-lg">
+                  The plate is segmented before anything is counted, so a mixed bowl is read as its
+                  parts instead of one averaged guess.
+                </p>
               </div>
-              <div class="step-visual">
-                <div class="step-visual-card">
-                  <svg class="step-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-                    <circle cx="12" cy="13" r="4"></circle>
-                  </svg>
-                  <div class="step-visual-ring"></div>
+            </li>
+
+            <li data-reveal="fade" data-reveal-delay="0.06" class="rule group last:border-b last:border-b-ink/12">
+              <div class="grid gap-3 py-9 sm:grid-cols-[4rem_1fr_1.2fr] sm:items-baseline sm:gap-8">
+                <span class="index-label" aria-hidden="true">02</span>
+                <h3 class="headline text-2xl text-ink transition-transform duration-500 group-hover:translate-x-2 sm:text-3xl">
+                  Portions read from the frame
+                </h3>
+                <p class="text-base leading-relaxed text-ink/55 sm:text-lg">
+                  Plate diameter, depth and shadow give the model scale, so "a bowl of rice" turns
+                  into grams instead of a shrug.
+                </p>
+              </div>
+            </li>
+
+            <li data-reveal="fade" data-reveal-delay="0.12" class="rule group last:border-b last:border-b-ink/12">
+              <div class="grid gap-3 py-9 sm:grid-cols-[4rem_1fr_1.2fr] sm:items-baseline sm:gap-8">
+                <span class="index-label" aria-hidden="true">03</span>
+                <h3 class="headline text-2xl text-ink transition-transform duration-500 group-hover:translate-x-2 sm:text-3xl">
+                  Weak photos are called out
+                </h3>
+                <p class="text-base leading-relaxed text-ink/55 sm:text-lg">
+                  Blur, glare and hard shadow are checked first. If the frame isn't good enough you
+                  get concrete advice instead of a confident wrong number.
+                </p>
+              </div>
+            </li>
+
+            <li data-reveal="fade" data-reveal-delay="0.18" class="rule group last:border-b last:border-b-ink/12">
+              <div class="grid gap-3 py-9 sm:grid-cols-[4rem_1fr_1.2fr] sm:items-baseline sm:gap-8">
+                <span class="index-label" aria-hidden="true">04</span>
+                <h3 class="headline text-2xl text-ink transition-transform duration-500 group-hover:translate-x-2 sm:text-3xl">
+                  Numbers you can audit
+                </h3>
+                <p class="text-base leading-relaxed text-ink/55 sm:text-lg">
+                  Every total is the sum of items you can see and correct. Nothing hides behind a
+                  single score.
+                </p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ==================== 06 — FAQ ==================== -->
+      <section id="faq" class="section bg-base" aria-labelledby="faq-heading">
+        <div class="container-edit">
+          <div class="rule flex items-baseline justify-between pt-6">
+            <p data-reveal="fade" class="index-label">06</p>
+            <p data-reveal="fade" class="index-label">Questions</p>
+          </div>
+
+          <div class="mt-16 grid gap-12 lg:grid-cols-[1fr_1.5fr] lg:gap-20">
+            <h2
+              id="faq-heading"
+              data-reveal="words"
+              data-reveal-stagger="0.04"
+              class="headline text-[clamp(2.25rem,4.5vw,3.5rem)] text-ink"
+            >
+              Before you try it.
+            </h2>
+
+            <div id="faq-list">
+              <div data-reveal="fade" data-reveal-delay="0" class="rule last:border-b last:border-b-ink/12">
+                <button
+                  type="button"
+                  data-faq-trigger
+                  aria-expanded="true"
+                  aria-controls="faq-panel-0"
+                  class="group flex w-full items-center justify-between gap-6 py-7 text-left text-lg font-medium tracking-tight text-ink transition-colors hover:text-ink/60 sm:text-xl"
+                >
+                  How accurate are the calorie numbers?
+                  <span class="relative block size-4 shrink-0" aria-hidden="true">
+                    <span class="absolute left-0 top-1/2 h-px w-full bg-current transition-transform duration-500"></span>
+                    <span data-faq-cross class="absolute left-1/2 top-0 h-full w-px bg-current transition-transform duration-500"></span>
+                  </span>
+                </button>
+                <div id="faq-panel-0" role="region" data-faq-panel class="grid transition-[grid-template-rows] duration-500 ease-out" style="grid-template-rows: 1fr">
+                  <div class="overflow-hidden">
+                    <p class="max-w-2xl pb-8 leading-relaxed text-ink/55">
+                      For plated, clearly lit meals the totals land within roughly 10% of a weighed
+                      reference. Mixed dishes, sauces and anything buried under other food are
+                      harder — treat the number as a good estimate, not a scale reading.
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div class="step-row step-row-reverse" data-scroll="fade-up" data-scroll-delay="100">
-              <div class="step-text">
-                <span class="step-number-badge">02</span>
-                <h3>AI Does the Work</h3>
-                <p>Our model identifies individual food items, estimates portions based on visual cues, and calculates a detailed nutritional breakdown in seconds.</p>
+              <div data-reveal="fade" data-reveal-delay="0.05" class="rule last:border-b last:border-b-ink/12">
+                <button
+                  type="button"
+                  data-faq-trigger
+                  aria-expanded="false"
+                  aria-controls="faq-panel-1"
+                  class="group flex w-full items-center justify-between gap-6 py-7 text-left text-lg font-medium tracking-tight text-ink transition-colors hover:text-ink/60 sm:text-xl"
+                >
+                  Do I need an account?
+                  <span class="relative block size-4 shrink-0" aria-hidden="true">
+                    <span class="absolute left-0 top-1/2 h-px w-full bg-current transition-transform duration-500"></span>
+                    <span data-faq-cross class="absolute left-1/2 top-0 h-full w-px bg-current transition-transform duration-500"></span>
+                  </span>
+                </button>
+                <div id="faq-panel-1" role="region" data-faq-panel class="grid transition-[grid-template-rows] duration-500 ease-out" style="grid-template-rows: 0fr">
+                  <div class="overflow-hidden">
+                    <p class="max-w-2xl pb-8 leading-relaxed text-ink/55">
+                      No. Drop a photo in and you get the breakdown. Your scan history is kept in
+                      your browser, on your device.
+                    </p>
+                  </div>
+                </div>
               </div>
-              <div class="step-visual">
-                <div class="step-visual-card step-visual-processing">
-                  <svg class="step-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-                  </svg>
-                  <div class="processing-dots">
-                    <span></span><span></span><span></span>
+
+              <div data-reveal="fade" data-reveal-delay="0.1" class="rule last:border-b last:border-b-ink/12">
+                <button
+                  type="button"
+                  data-faq-trigger
+                  aria-expanded="false"
+                  aria-controls="faq-panel-2"
+                  class="group flex w-full items-center justify-between gap-6 py-7 text-left text-lg font-medium tracking-tight text-ink transition-colors hover:text-ink/60 sm:text-xl"
+                >
+                  What happens to my photos?
+                  <span class="relative block size-4 shrink-0" aria-hidden="true">
+                    <span class="absolute left-0 top-1/2 h-px w-full bg-current transition-transform duration-500"></span>
+                    <span data-faq-cross class="absolute left-1/2 top-0 h-full w-px bg-current transition-transform duration-500"></span>
+                  </span>
+                </button>
+                <div id="faq-panel-2" role="region" data-faq-panel class="grid transition-[grid-template-rows] duration-500 ease-out" style="grid-template-rows: 0fr">
+                  <div class="overflow-hidden">
+                    <p class="max-w-2xl pb-8 leading-relaxed text-ink/55">
+                      The photo is sent to the vision model for the single analysis and is not
+                      stored on our side. Nothing is published, and the history stays local.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div data-reveal="fade" data-reveal-delay="0.15" class="rule last:border-b last:border-b-ink/12">
+                <button
+                  type="button"
+                  data-faq-trigger
+                  aria-expanded="false"
+                  aria-controls="faq-panel-3"
+                  class="group flex w-full items-center justify-between gap-6 py-7 text-left text-lg font-medium tracking-tight text-ink transition-colors hover:text-ink/60 sm:text-xl"
+                >
+                  Does it work with packaged food?
+                  <span class="relative block size-4 shrink-0" aria-hidden="true">
+                    <span class="absolute left-0 top-1/2 h-px w-full bg-current transition-transform duration-500"></span>
+                    <span data-faq-cross class="absolute left-1/2 top-0 h-full w-px bg-current transition-transform duration-500"></span>
+                  </span>
+                </button>
+                <div id="faq-panel-3" role="region" data-faq-panel class="grid transition-[grid-template-rows] duration-500 ease-out" style="grid-template-rows: 0fr">
+                  <div class="overflow-hidden">
+                    <p class="max-w-2xl pb-8 leading-relaxed text-ink/55">
+                      Yes — and usually better than a home-cooked plate, because the label and
+                      packaging give the model exact quantities to work from.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div data-reveal="fade" data-reveal-delay="0.2" class="rule last:border-b last:border-b-ink/12">
+                <button
+                  type="button"
+                  data-faq-trigger
+                  aria-expanded="false"
+                  aria-controls="faq-panel-4"
+                  class="group flex w-full items-center justify-between gap-6 py-7 text-left text-lg font-medium tracking-tight text-ink transition-colors hover:text-ink/60 sm:text-xl"
+                >
+                  Can I correct what it found?
+                  <span class="relative block size-4 shrink-0" aria-hidden="true">
+                    <span class="absolute left-0 top-1/2 h-px w-full bg-current transition-transform duration-500"></span>
+                    <span data-faq-cross class="absolute left-1/2 top-0 h-full w-px bg-current transition-transform duration-500"></span>
+                  </span>
+                </button>
+                <div id="faq-panel-4" role="region" data-faq-panel class="grid transition-[grid-template-rows] duration-500 ease-out" style="grid-template-rows: 0fr">
+                  <div class="overflow-hidden">
+                    <p class="max-w-2xl pb-8 leading-relaxed text-ink/55">
+                      Every item is listed separately with the portion the model assumed, so
+                      anything that looks off is visible rather than baked into one total.
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
-
-            <div class="step-row" data-scroll="fade-up" data-scroll-delay="100">
-              <div class="step-text">
-                <span class="step-number-badge">03</span>
-                <h3>Review & Log</h3>
-                <p>See the full breakdown — calories, protein, carbs, fats. Confirm and it's logged instantly. Your nutrition diary fills itself.</p>
-              </div>
-              <div class="step-visual">
-                <div class="step-visual-card">
-                  <svg class="step-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                  </svg>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </section>
 
-      <!-- ======================== SHOWCASE / BIG VISUAL ======================== -->
-      <section class="showcase">
-        <div class="container">
-          <div class="showcase-content" data-scroll="fade-up">
-            <span class="section-eyebrow">Designed for clarity</span>
-            <h2 class="section-title">Your nutrition,<br>at a glance.</h2>
-            <p class="section-subtitle">Clean charts. Real data. No clutter. CalorieLens shows you exactly what matters — beautifully.</p>
-            <a href="/scan.html" class="btn btn-primary btn-lg">
-              <span>Try It Free</span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-            </a>
-          </div>
-        </div>
-      </section>
+      <!-- ==================== CTA ==================== -->
+      <section class="bg-ink py-[clamp(7rem,14vw,12rem)] text-base" aria-labelledby="cta-heading">
+        <div class="container-edit flex flex-col items-center text-center">
+          <h2
+            id="cta-heading"
+            data-reveal="words"
+            data-reveal-stagger="0.05"
+            class="display max-w-4xl text-[clamp(2.75rem,7vw,6rem)] text-base"
+          >
+            Ready to stop guessing?
+          </h2>
 
-      <!-- ======================== CTA ======================== -->
-      <section id="cta" class="cta-section">
-        <div class="container">
-          <div class="cta-card" data-scroll="fade-up">
-            <div class="cta-glow"></div>
-            <span class="section-eyebrow cta-eyebrow">Get started</span>
-            <h2 class="section-title">Ready to eat smarter?</h2>
-            <p>Join thousands getting early access. Be the first to experience the future of nutrition tracking.</p>
-            <form class="waitlist-form" id="waitlist-form">
-              <input type="email" placeholder="Enter your email" required class="input-field" id="waitlist-email">
-              <button type="submit" class="btn btn-primary" id="waitlist-submit">Join Waitlist</button>
-            </form>
-            <p class="cta-note">Free during beta. No credit card required.</p>
-          </div>
+          <p data-reveal="fade" data-reveal-delay="0.25" class="mt-8 max-w-md text-lg text-base/60">
+            Scan a meal in seconds. From here on, the log fills itself.
+          </p>
+
+          <a
+            data-reveal="scale"
+            data-reveal-delay="0.4"
+            href="#upload"
+            data-magnetic="0.3"
+            class="btn-invert mt-12 inline-flex items-center justify-center overflow-hidden rounded-full bg-base px-10 py-5 text-lg font-medium tracking-tight text-ink transition-transform duration-500 hover:scale-[1.03] active:scale-[0.97]"
+          >
+            <span class="btn-label">
+              <span>Scan a meal</span>
+              <span aria-hidden="true">Scan a meal</span>
+            </span>
+          </a>
+
+          <form id="waitlist-form" data-reveal="fade" data-reveal-delay="0.5" class="mt-14 flex w-full max-w-md flex-col gap-3 sm:flex-row">
+            <input
+              id="waitlist-email"
+              type="email"
+              required
+              placeholder="you@email.com"
+              aria-label="Email address"
+              class="w-full rounded-full border border-base/25 bg-transparent px-6 py-3.5 text-base text-base placeholder:text-base/35 transition-colors focus:border-base/60 focus:outline-none"
+            />
+            <button
+              id="waitlist-submit"
+              type="submit"
+              class="btn-invert inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-base px-7 py-3.5 text-base font-medium tracking-tight text-ink transition-transform duration-500 hover:scale-[1.03] active:scale-[0.97]"
+            >
+              <span class="btn-label">
+                <span>Join the waitlist</span>
+                <span aria-hidden="true">Join the waitlist</span>
+              </span>
+            </button>
+          </form>
+
+          <p data-reveal="fade" data-reveal-delay="0.55" class="mt-10 max-w-lg text-sm leading-relaxed text-base/40">
+            Free during the beta, no card required. CalorieLens estimates — it isn't a medical or
+            dietetic service, and anything you're basing a health decision on deserves a
+            professional's eyes.
+          </p>
         </div>
       </section>
     </main>
 
-    <footer class="footer">
-      <div class="container footer-inner">
-        <div class="footer-top">
-          <div class="footer-brand">
-            <div class="footer-logo">
-              <svg class="logo-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <circle cx="12" cy="12" r="4"></circle>
-              </svg>
-              CalorieLens
-            </div>
-            <p class="footer-tagline">Nutrition, simplified.</p>
-          </div>
-          <div class="footer-link-group">
-            <h4>Product</h4>
-            <a href="#features">Features</a>
-            <a href="#how-it-works">How it works</a>
-            <a href="/scan.html">Scanner</a>
-          </div>
-          <div class="footer-link-group">
-            <h4>Company</h4>
-            <a href="#">About</a>
-            <a href="#">Blog</a>
-            <a href="#">Careers</a>
-          </div>
-          <div class="footer-link-group">
-            <h4>Legal</h4>
-            <a href="#">Privacy</a>
-            <a href="#">Terms</a>
-            <a href="#">Contact</a>
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="overflow-hidden bg-ink pb-8 text-base">
+      <div class="container-edit">
+        <div class="grid gap-10 border-t border-base/15 pt-14 sm:grid-cols-3">
+          <nav aria-label="Page">
+            <h3 class="text-xs font-medium uppercase tracking-[0.14em] text-base/35">Page</h3>
+            <ul class="mt-5 space-y-3">
+              <li><a href="#scanner" class="link-draw text-sm text-base/60 hover:text-base">Scan</a></li>
+              <li><a href="#how-it-works" class="link-draw text-sm text-base/60 hover:text-base">How it works</a></li>
+              <li><a href="#accuracy" class="link-draw text-sm text-base/60 hover:text-base">Accuracy</a></li>
+              <li><a href="#technology" class="link-draw text-sm text-base/60 hover:text-base">Technology</a></li>
+              <li><a href="#faq" class="link-draw text-sm text-base/60 hover:text-base">Questions</a></li>
+            </ul>
+          </nav>
+
+          <nav aria-label="Product">
+            <h3 class="text-xs font-medium uppercase tracking-[0.14em] text-base/35">Product</h3>
+            <ul class="mt-5 space-y-3">
+              <li><a href="/scan.html" class="link-draw text-sm text-base/60 hover:text-base">Full scanner</a></li>
+              <li><a href="mailto:hello@calorielens.app" class="link-draw text-sm text-base/60 hover:text-base">hello&#64;calorielens.app</a></li>
+            </ul>
+          </nav>
+
+          <div>
+            <h3 class="text-xs font-medium uppercase tracking-[0.14em] text-base/35">Nutrition note</h3>
+            <p class="mt-5 text-sm leading-relaxed text-base/50">
+              CalorieLens estimates nutrition from a photo. Values are approximate and are not a
+              substitute for professional dietary advice.
+            </p>
           </div>
         </div>
-        <div class="footer-bottom">
-          <p>&copy; 2026 CalorieLens Inc. All rights reserved.</p>
-        </div>
+
+        <p class="mt-14 text-xs text-base/35">
+          © <span id="footer-year">2026</span> CalorieLens. All rights reserved.
+        </p>
       </div>
+
+      <p
+        id="wordmark"
+        class="mt-10 select-none whitespace-nowrap text-center font-semibold leading-none tracking-tighter text-base/90"
+        style="font-size: clamp(2.5rem, 12.2vw, 12rem)"
+        aria-hidden="true"
+      ></p>
     </footer>
 
     <script type="module" src="/src/main.ts"></script>
