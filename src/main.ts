@@ -49,7 +49,7 @@ function initNavbar(): void {
 }
 
 // ============================================================
-// Hero — masked headline lines rise on load, the block drifts on exit.
+//
 // ============================================================
 
 function initHero(): void {
