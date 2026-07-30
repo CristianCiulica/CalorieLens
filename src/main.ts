@@ -100,7 +100,7 @@ function initCardStack(): void {
 
   const total = cards.length;
 
-  // One scrubbed timeline (duration 1 == container progress 0→1);
+
   // each card shrinks over [i/total, 1], the last one stays at 1.
   const timeline = gsap.timeline({
     defaults: { ease: 'none' },
