@@ -136,9 +136,6 @@ function initCardStack(): void {
   });
 }
 
-// ============================================================
-// Stats — counters ride a GSAP tween triggered once per figure.
-// ============================================================
 
 function initCounters(): void {
   document.querySelectorAll<HTMLElement>('.counter').forEach((counter) => {
