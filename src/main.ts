@@ -349,7 +349,6 @@ function initDayTargets(): void {
       bar.title = `${values[i].toLocaleString('en-US')} kcal`;
     });
 
-    // Count the headline figure to its new value.
     if (reducedMotion()) {
       caloriesEl.textContent = goal.calories.toLocaleString('en-US');
       current = goal.calories;
