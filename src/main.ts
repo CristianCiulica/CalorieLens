@@ -101,7 +101,6 @@ function initCardStack(): void {
   const total = cards.length;
 
 
-  // each card shrinks over [i/total, 1], the last one stays at 1.
   const timeline = gsap.timeline({
     defaults: { ease: 'none' },
     scrollTrigger: {
