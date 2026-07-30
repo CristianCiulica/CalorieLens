@@ -48,9 +48,6 @@ function initNavbar(): void {
   onScroll(paint);
 }
 
-// ============================================================
-//
-// ============================================================
 
 function initHero(): void {
   const wrap = $('[data-hero]');
