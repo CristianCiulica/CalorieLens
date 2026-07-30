@@ -9,11 +9,6 @@ import { GOALS, itemRowsHtml, macroRowsHtml } from './core/nutrition';
 
 const $ = <T extends HTMLElement>(sel: string): T | null => document.querySelector<T>(sel);
 
-// ============================================================
-// Navbar — transparent over the hero, glass after the fold.
-// Hides on scroll-down, returns on scroll-up.
-// ============================================================
-
 function initNavbar(): void {
   const header = $('#navbar');
   const toggle = $<HTMLButtonElement>('#menu-toggle');
