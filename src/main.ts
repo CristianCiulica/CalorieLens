@@ -92,10 +92,6 @@ function initManifesto(): void {
   });
 }
 
-// ============================================================
-// How it works — sticky card stack. As the next card scrolls over it,
-// the one underneath shrinks, dims and blurs slightly.
-// ============================================================
 
 function initCardStack(): void {
   const stack = $('#stack');
