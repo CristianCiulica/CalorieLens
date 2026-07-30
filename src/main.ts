@@ -270,10 +270,6 @@ function initMarquee(): void {
   track.innerHTML = once + once;
 }
 
-// ============================================================
-// Your day — goal presets drive the daily targets and the week chart.
-// Switching a goal re-counts every number and redraws the bars.
-// ============================================================
 
 const WEEK_SCALE = 2900;
 /** Dimmed paper — a solid bone block this large would glare on the ground. */
