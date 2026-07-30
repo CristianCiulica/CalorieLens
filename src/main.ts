@@ -398,11 +398,6 @@ function initDayTargets(): void {
   });
 }
 
-// ============================================================
-// Showcase — the landing shows the shape of an answer, it doesn't take
-// uploads. Scanning happens in the app at /scan.html.
-// ============================================================
-
 function initShowcase(): void {
   const photo = $<HTMLImageElement>('#showcase-photo');
   const meal = $('#showcase-meal');
