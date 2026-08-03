@@ -29,7 +29,6 @@ and a hairline FAQ accordion.
 - **GSAP** + ScrollTrigger for motion, **Lenis** for smooth scroll
 - **Google Gemini 2.0 Flash** for image analysis
 ## Getting started
-
 ```bash
 npm install
 npm run dev
