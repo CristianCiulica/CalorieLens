@@ -8,7 +8,6 @@ app that reads a photo of a plate and turns it into a nutrition breakdown that
 lands in your daily log.
 
 ## Features
-
 **Landing** — a scroll-driven page: masked headline reveals, a scrubbed
 manifesto, a sticky card stack for the four steps, animated accuracy counters,
 a goal switcher (Cut / Maintain / Build) wired to a seven-day calorie chart,
