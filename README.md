@@ -28,7 +28,6 @@ and a hairline FAQ accordion.
 - **Tailwind CSS v4** for utilities, on top of a hand-written design system
 - **GSAP** + ScrollTrigger for motion, **Lenis** for smooth scroll
 - **Google Gemini 2.0 Flash** for image analysis
-
 ## Getting started
 
 ```bash
