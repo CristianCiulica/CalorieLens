@@ -5,6 +5,7 @@ No manual logging, no account.
 
 
 
+
 CalorieLens is a two-surface web app: an editorial landing page, and a scanner
 app that reads a photo of a plate and turns it into a nutrition breakdown that
 lands in your daily log.
