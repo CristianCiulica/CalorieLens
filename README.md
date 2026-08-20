@@ -12,6 +12,7 @@ manifesto, a sticky card stack for the four steps, animated accuracy counters,
 a goal switcher (Cut / Maintain / Build) wired to a seven-day calorie chart,
 and a hairline FAQ accordion.
 
+
 **Scanner** (`/scan.html`) — the app itself, on a three-column shell:
 - Drop a photo or shoot one; every state is designed — idle, drag-over,
   preview, staged analysis, breakdown, error.
